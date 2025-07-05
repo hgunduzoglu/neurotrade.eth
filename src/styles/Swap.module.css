@@ -1,11 +1,124 @@
 .container {
-  min-height: 100vh;
   padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.swapForm {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-weight: 500;
+  color: #343a40;
+}
+
+.input, .select {
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background-color: white;
+}
+
+.input:focus, .select:focus {
+  outline: none;
+  border-color: #4263eb;
+}
+
+.select {
+  cursor: pointer;
+}
+
+.select:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+.button {
+  padding: 1rem;
+  background-color: #4263eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #364fc7;
+}
+
+.button:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.quoteInfo {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.quoteInfo h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #343a40;
+}
+
+.quoteInfo pre {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.tokenOption {
+  display: flex;
   align-items: center;
-  background-color: #f5f5f5;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.tokenLogo {
+  border-radius: 50%;
+}
+
+.tokenSymbol {
+  font-weight: 500;
+  color: #343a40;
+}
+
+.tokenName {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.selectedToken {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
 }
 
 .swapCard {
@@ -22,37 +135,6 @@
   margin-bottom: 2rem;
   color: #333;
   font-size: 1.5rem;
-}
-
-.inputGroup {
-  margin-bottom: 1.5rem;
-}
-
-.inputGroup label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.input, .select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-.input:focus, .select:focus {
-  outline: none;
-  border-color: #0070f3;
-}
-
-.select {
-  background-color: white;
-  cursor: pointer;
 }
 
 .switchButton {
@@ -72,37 +154,6 @@
 .switchButton:hover {
   background-color: #e0e0e0;
   transform: scale(1.1);
-}
-
-.swapButton {
-  width: 100%;
-  padding: 1rem;
-  border: none;
-  border-radius: 10px;
-  background-color: #0070f3;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.swapButton:hover:not(:disabled) {
-  background-color: #0060df;
-}
-
-.swapButton:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.quoteInfo {
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  color: #666;
 }
 
 .error {
@@ -129,4 +180,25 @@
   border: 1px solid #fcd34d;
   color: #b45309;
   font-size: 0.9rem;
+}
+
+.connectionStatus {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: #f0f9ff;
+  border: 1px solid #7dd3fc;
+  color: #0369a1;
+  font-size: 0.9rem;
+}
+
+.loading {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  font-size: 0.9rem;
+  text-align: center;
 } 

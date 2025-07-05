@@ -5,6 +5,7 @@ import styles from '@/styles/Home.module.css';
 import { config, queryClient } from '@/config/wagmi';
 import { EnsProfile } from '@/components/EnsProfile';
 import { TextRecords } from '@/components/TextRecords';
+import Link from 'next/link';
 
 export default function Home() {
   const { login, logout, authenticated, user } = usePrivy();
@@ -62,6 +63,13 @@ export default function Home() {
                 </button>
               </div>
             )}
+
+            <div className={styles.grid}>
+              <Link href="/swap" className={styles.card}>
+                <h2>Swap &rarr;</h2>
+                <p>Swap your tokens using 1inch Fusion+</p>
+              </Link>
+            </div>
           </main>
         </div>
       </WagmiConfig>
