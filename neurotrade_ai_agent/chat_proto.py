@@ -15,6 +15,9 @@ from uagents_core.contrib.protocols.chat import (
     chat_protocol_spec,
 )
 
+# Import The Graph MCP client
+from graph_mcp_client import get_graph_mcp_dispatcher
+
 # AI Agent Address for structured output processing
 AI_AGENT_ADDRESS = 'agent1q0h70caed8ax769shpemapzkyk65uscw4xwk6dc4t3emvp5jdcvqs9xs32y'
 
@@ -26,85 +29,116 @@ class TradingRequest(Model):
     query: str
     action_type: str = "general"  # price, buy, sell, swap, analysis, general
 
+# Global The Graph MCP dispatcher instance
+graph_mcp_dispatcher = None
 
-# Trading analysis function
+async def initialize_graph_mcp():
+    """Initialize The Graph MCP client"""
+    global graph_mcp_dispatcher
+    if graph_mcp_dispatcher is None:
+        graph_mcp_dispatcher = await get_graph_mcp_dispatcher()
+
+# Enhanced trading analysis function using The Graph MCP
 async def get_trading_info(query: str) -> str:
-    """Get ETH trading information and analysis"""
+    """Get enhanced trading information and analysis via The Graph MCP"""
     try:
-        # Get real-time ETH price from CoinGecko
+        # Initialize The Graph MCP client if not already done
+        await initialize_graph_mcp()
+        
+        # Use The Graph MCP dispatcher (includes built-in fallback)
+        if graph_mcp_dispatcher:
+            result = await graph_mcp_dispatcher.dispatch_query(query)
+            if result and "❌" not in result:
+                return result
+        
+        # If MCP fails, provide basic fallback response
+        return await get_basic_trading_info(query)
+        
+    except Exception as e:
+        # Final fallback to basic trading info
+        return await get_basic_trading_info(query, error=str(e))
+
+async def get_basic_trading_info(query: str, error: str = None) -> str:
+    """Basic fallback trading info when MCP is unavailable"""
+    query_lower = query.lower()
+    
+    # Try to get basic ETH price as last resort
+    eth_price = 2500  # Default fallback price
+    try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                "https://api.coingecko.com/api/v3/simple/price",
-                params={
-                    "ids": "ethereum",
-                    "vs_currencies": "usd",
-                    "include_24hr_change": "true",
-                    "include_24hr_vol": "true"
-                }
+                "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
             ) as response:
                 if response.status == 200:
                     data = await response.json()
-                    eth_data = data.get("ethereum", {})
-                    price = eth_data.get("usd", 2500)
-                    change_24h = eth_data.get("usd_24h_change", 0)
-                    volume_24h = eth_data.get("usd_24h_vol", 0)
-                else:
-                    price, change_24h, volume_24h = 2500, 0, 0
-    except Exception as e:
-        price, change_24h, volume_24h = 2500, 0, 0
+                    eth_price = data.get("ethereum", {}).get("usd", 2500)
+    except Exception:
+        pass  # Use default price
     
-    # Generate trading analysis
-    query_lower = query.lower()
-    
+    # Generate basic analysis
     analysis = f"🚀 **NeuroTrade AI Analysis**\n\n"
-    analysis += f"💰 **Current ETH Price**: ${price:,.2f} USD\n"
-    analysis += f"📈 **24h Change**: {change_24h:+.2f}%\n"
-    analysis += f"💹 **24h Volume**: ${volume_24h:,.0f} USD\n\n"
     
-    # Market sentiment
-    sentiment = "🟢 Bullish" if change_24h > 0 else "🔴 Bearish" if change_24h < -2 else "🟡 Neutral"
-    analysis += f"🎯 **Market Sentiment**: {sentiment}\n\n"
+    if error:
+        analysis += f"⚠️ **Note**: Using fallback mode due to connection issues\n\n"
     
-    if "price" in query_lower:
-        analysis += f"📊 **Price Analysis**:\n"
-        analysis += f"• ETH is {'up' if change_24h > 0 else 'down'} {abs(change_24h):.2f}% today\n"
-        analysis += f"• Trading volume is {'high' if volume_24h > 10000000000 else 'normal'}\n"
-        analysis += f"• Price momentum: {'Bullish' if change_24h > 1 else 'Bearish' if change_24h < -1 else 'Neutral'}\n\n"
-    elif "buy" in query_lower:
-        analysis += f"🔵 **Buy Signal Analysis**:\n"
-        if change_24h > 0:
-            analysis += f"✅ **Positive momentum** - Consider buying\n"
-            analysis += f"• Entry point: Current levels look favorable\n"
-            analysis += f"• Strategy: Dollar-cost averaging recommended\n"
-        else:
-            analysis += f"⚠️ **Negative momentum** - Wait for confirmation\n"
-            analysis += f"• Entry point: Consider lower levels\n"
-            analysis += f"• Strategy: Set buy orders below current price\n"
-        analysis += f"• Risk Level: Moderate\n\n"
-    elif "sell" in query_lower:
-        analysis += f"🔴 **Sell Signal Analysis**:\n"
-        if change_24h < -2:
-            analysis += f"⚠️ **Strong downward pressure** - Consider selling\n"
-            analysis += f"• Exit strategy: Take profits if in green\n"
-            analysis += f"• Risk management: Set stop-losses\n"
-        else:
-            analysis += f"✅ **Price holding well** - Partial profit taking\n"
-            analysis += f"• Exit strategy: Trailing stops recommended\n"
-        analysis += f"• Risk Level: Moderate\n\n"
-    elif "swap" in query_lower:
-        analysis += f"🔄 **Swap Analysis**:\n"
-        analysis += f"• Current ETH price: ${price:,.2f}\n"
-        analysis += f"• Gas fees: Check current network congestion\n"
-        analysis += f"• Liquidity: {'Good' if volume_24h > 5000000000 else 'Check DEX pools'}\n"
-        analysis += f"• Timing: {'Favorable' if abs(change_24h) < 3 else 'Volatile - use limit orders'}\n\n"
+    if any(keyword in query_lower for keyword in ["token", "price", "eth", "usdc"]):
+        analysis += f"💰 **Token Information**:\n"
+        analysis += f"• Current ETH Price: ${eth_price:,.2f} USD\n"
+        analysis += f"• Data Source: CoinGecko (Fallback)\n\n"
+        
+        analysis += f"📊 **Available via The Graph MCP**:\n"
+        analysis += f"• Real-time token data\n"
+        analysis += f"• Network statistics\n"
+        analysis += f"• Indexer information\n"
+        analysis += f"• Allocation data\n\n"
+        
+    elif "indexer" in query_lower:
+        analysis += f"🔍 **Indexer Information**:\n"
+        analysis += f"• The Graph indexers process blockchain data\n"
+        analysis += f"• Stake GRT tokens to participate\n"
+        analysis += f"• Earn rewards for quality indexing\n\n"
+        
+        analysis += f"📈 **Available via The Graph MCP**:\n"
+        analysis += f"• Real-time indexer metrics\n"
+        analysis += f"• Performance statistics\n"
+        analysis += f"• Allocation tracking\n\n"
+        
+    elif "allocation" in query_lower:
+        analysis += f"📊 **Allocation Information**:\n"
+        analysis += f"• Indexers allocate stake to subgraphs\n"
+        analysis += f"• Allocations earn indexing rewards\n"
+        analysis += f"• Active management required\n\n"
+        
+        analysis += f"🎯 **Available via The Graph MCP**:\n"
+        analysis += f"• Live allocation data\n"
+        analysis += f"• Reward calculations\n"
+        analysis += f"• Performance metrics\n\n"
+        
+    elif any(keyword in query_lower for keyword in ["network", "stats"]):
+        analysis += f"🌐 **Network Statistics**:\n"
+        analysis += f"• The Graph Protocol network info\n"
+        analysis += f"• Total indexers and delegators\n"
+        analysis += f"• Network activity metrics\n\n"
+        
+        analysis += f"📈 **Available via The Graph MCP**:\n"
+        analysis += f"• Real-time network data\n"
+        analysis += f"• Protocol metrics\n"
+        analysis += f"• Usage statistics\n\n"
+        
     else:
-        analysis += f"💡 **General Trading Info**:\n"
-        analysis += f"• Ask me about 'ETH price', 'buy ETH', 'sell ETH', or 'swap ETH'\n"
-        analysis += f"• I provide real-time analysis and recommendations\n"
-        analysis += f"• Multi-chain support: Ethereum, Arbitrum, Polygon, Optimism, Base\n\n"
+        analysis += f"🤖 **NeuroTrade AI - The Graph MCP Integration**\n\n"
+        analysis += f"**Available Queries**:\n"
+        analysis += f"• **Token Data**: 'ETH price', 'USDC token info'\n"
+        analysis += f"• **Indexer Info**: 'show indexer information'\n"
+        analysis += f"• **Allocations**: 'allocation data'\n"
+        analysis += f"• **Network Stats**: 'network statistics'\n\n"
+        
+        analysis += f"**Data Sources**:\n"
+        analysis += f"• Primary: The Graph MCP Server\n"
+        analysis += f"• Fallback: CoinGecko API\n\n"
     
     analysis += f"---\n"
-    analysis += f"🤖 **NeuroTrade AI** - Your Smart Trading Assistant\n"
+    analysis += f"🤖 **NeuroTrade AI** - The Graph MCP Integration\n"
     analysis += f"⚡ **Real-time Data** | 🔒 **Secure** | 🎯 **Accurate**"
     
     return analysis

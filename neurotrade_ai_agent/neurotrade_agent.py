@@ -24,13 +24,9 @@ AGENT_SEED = os.getenv("AGENT_SEED", "neurotrade_ai_agent_seed_2024")
 AGENT_PORT = int(os.getenv("AGENT_PORT", "8001"))
 USE_AGENTVERSE = os.getenv("USE_AGENTVERSE", "true").lower() == "true"
 
-# The Graph endpoints for different chains
-GRAPH_ENDPOINTS = {
-    "ethereum": "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3",
-    "arbitrum": "https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-minimal",
-    "polygon": "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon",
-    "optimism": "https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis"
-}
+# The Graph MCP Server Configuration
+GRAPH_MCP_URL = "https://token-api.mcp.thegraph.com"
+GRAPH_MCP_SSE_URL = "https://token-api.mcp.thegraph.com/sse"
 
 # Create the NeuroTrade AI Agent with proper mailbox configuration
 if True:
@@ -65,59 +61,15 @@ except Exception as e:
 # trading_protocol = Protocol("NeuroTrade Trading Protocol")
 
 class TradingData:
-    """Class to store and manage trading data"""
+    """Class to store and manage trading data - simplified for MCP integration"""
     def __init__(self):
         self.token_prices = {}
         self.market_trends = {}
         self.last_update = None
 
-    async def fetch_token_price(self, token_address: str, chain: str = "ethereum") -> Optional[float]:
-        """Fetch token price from The Graph"""
-        try:
-            query = f"""
-            {{
-                token(id: "{token_address.lower()}") {{
-                    id
-                    symbol
-                    name
-                    derivedETH
-                    totalSupply
-                    volume
-                    volumeUSD
-                    feesUSD
-                    txCount
-                }}
-            }}
-            """
-            
-            endpoint = GRAPH_ENDPOINTS.get(chain, GRAPH_ENDPOINTS["ethereum"])
-            
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    endpoint,
-                    json={"query": query},
-                    headers={"Content-Type": "application/json"}
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        if "data" in data and data["data"]["token"]:
-                            token_data = data["data"]["token"]
-                            # Convert derivedETH to USD (assuming ETH price)
-                            eth_price = await self.get_eth_price()
-                            if eth_price and token_data["derivedETH"]:
-                                return float(token_data["derivedETH"]) * eth_price
-                        return None
-                    else:
-                        logger.error(f"Graph API error: {response.status}")
-                        return None
-        except Exception as e:
-            logger.error(f"Error fetching token price: {e}")
-            return None
-
     async def get_eth_price(self) -> Optional[float]:
-        """Get ETH price in USD"""
+        """Get ETH price in USD - fallback only"""
         try:
-            # Using a simple API to get ETH price
             async with aiohttp.ClientSession() as session:
                 async with session.get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd") as response:
                     if response.status == 200:
@@ -127,48 +79,6 @@ class TradingData:
         except Exception as e:
             logger.error(f"Error fetching ETH price: {e}")
             return 2500.0  # Fallback price
-
-    async def get_pool_liquidity(self, pool_address: str, chain: str = "ethereum") -> Optional[Dict]:
-        """Get pool liquidity data from The Graph"""
-        try:
-            query = f"""
-            {{
-                pool(id: "{pool_address.lower()}") {{
-                    id
-                    token0 {{
-                        symbol
-                        name
-                    }}
-                    token1 {{
-                        symbol
-                        name
-                    }}
-                    liquidity
-                    sqrtPrice
-                    tick
-                    volumeUSD
-                    txCount
-                    totalValueLockedUSD
-                }}
-            }}
-            """
-            
-            endpoint = GRAPH_ENDPOINTS.get(chain, GRAPH_ENDPOINTS["ethereum"])
-            
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    endpoint,
-                    json={"query": query},
-                    headers={"Content-Type": "application/json"}
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        if "data" in data and data["data"]["pool"]:
-                            return data["data"]["pool"]
-                    return None
-        except Exception as e:
-            logger.error(f"Error fetching pool liquidity: {e}")
-            return None
 
     def analyze_market_trend(self, price_data: Dict) -> str:
         """Analyze market trend based on price data"""
@@ -355,27 +265,19 @@ async def handle_generic_message(ctx: Context, sender: str, msg: GenericMessage)
     except Exception as e:
         ctx.logger.error(f"Error in generic message handler: {e}")
 
-# 🎯 OFFICIAL CHAT PROTOCOL INTEGRATION (Working Example)
+# 🎯 OFFICIAL CHAT PROTOCOL INTEGRATION with The Graph MCP
 try:
     from chat_proto import chat_proto, struct_output_client_proto
     neurotrade_agent.include(chat_proto, publish_manifest=True)
     neurotrade_agent.include(struct_output_client_proto, publish_manifest=True)
     print("🚀 Official Chat Protocol loaded successfully!")
-    print("🎯 Protocol: AgentChatProtocol v0.3.0 (Official)")
+    print("🎯 Protocol: AgentChatProtocol v0.3.0 with The Graph MCP")
     print("✅ Agent should now show 'Chat with Agent' button!")
     print("💬 Full chat functionality enabled!")
+    print("🔗 The Graph MCP integration ready!")
 except Exception as e:
     print(f"⚠️ Official Chat Protocol failed: {e}")
-    print("💡 Trying fallback protocols...")
-    
-    # Fallback 1: Custom protocol
-    try:
-        from neurotrade_chat_protocol import neurotrade_chat_protocol
-        neurotrade_agent.include(neurotrade_chat_protocol, publish_manifest=True)
-        print("✅ Custom chat protocol loaded!")
-    except Exception as e2:
-        print(f"❌ All chat protocols failed: {e2}")
-        print("💡 Agent will run without chat capabilities")
+    print("💡 Agent will run without chat capabilities")
 
 def signal_handler(signum, frame):
     """Handle shutdown signals gracefully"""

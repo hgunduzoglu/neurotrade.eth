@@ -1,353 +1,262 @@
-NeuroTrade.eth
-
-NeuroTrade.eth is an omnichain decentralized AI trading agent that helps users trade seamlessly and intelligently across multiple blockchains. It combines AI-generated trading signals, automated trading execution, and private, confidential compute to provide the next generation of decentralized finance tools.
-
-NeuroTrade supports three modes of operation:
-
-✅ AI Signals (Manual Execution) – AI generates trading signals, but the user decides whether to execute them.
-
-✅ Fully Automated AI Trading – The AI automatically executes trades based on market conditions without user intervention.
-
-✅ Automated User-Defined Rules – Users define specific trading rules (e.g. "Buy ETH if price drops to $2,400"), and NeuroTrade automatically executes trades when those conditions are met.
-
-NeuroTrade.eth is designed to maximize eligibility for numerous hackathon bounties by integrating many state-of-the-art web3 technologies.
-
-Technologies & Tools Used
-
-1. Fetch.AI (uAgents, Agentverse, ASI:One)
-
-Hosts the core NeuroTrade agent.
-
-Handles:
-
-receiving user prompts
-
-generating AI trading signals
-
-managing user-defined rules
-
-Deployed either locally or via Agentverse.ai.
-
-Registered as an agent discoverable on ASI:One.
-
-
-
-2. The Graph (Subgraphs & Substreams)
-
-Provides onchain data feeds for:
-
-token prices
-
-liquidity pools
-
-volume changes
-
-Enables NeuroTrade to:
-
-detect market opportunities
-
-trigger user rules
-
-generate informed AI signals.
-
-
-
-3. LayerZero
-
-Provides cross-chain messaging and bridging.
-
-Enables:
-
-moving tokens between chains
-
-executing trades across EVM networks
-
-Integrated for executing user trades on chains like Ethereum, Arbitrum, Base, and Mantle.
-
-
-
-4. Oasis ROFL (Runtime Off-chain Logic)
-
-Powers private compute for:
-
-confidential AI logic
-
-secure storage of user-defined trading rules
-
-Ensures:
-
-trading strategies remain private
-
-regulatory and user privacy compliance.
-
-
-
-5. Privy
-
-Handles:
-
-user authentication (email, social, wallet-based login)
-
-embedded wallet management
-
-Simplifies onboarding for non-crypto users.
-
-
-
-6. ENS (Ethereum Name Service)
-
-NeuroTrade is assigned the identity neurotrade.eth.
-
-Benefits:
-
-easy recognition of the AI agent
-
-can store agent metadata in text records (e.g. supported chains, trading model versions).
-
-
-
-7. Ledger / ERC-7730 Clear Signing
-
-Provides clear, human-readable transaction signing for:
-
-manual trades
-
-automatic trades if user chooses confirmation step
-
-Prevents malicious transactions by requiring explicit user approval.
-
-
-
-8. INTMAX (Optional)
-
-Provides privacy-focused payments and transfers.
-
-Users can:
-
-pay for NeuroTrade’s subscription or services anonymously
-
-execute private token transfers.
-
-
-
-How It Works
-
-User Flow
-
-Login
-
-User authenticates via Privy.
-
-NeuroTrade displays ENS identity if available (e.g. neurotrade.eth).
-
-Mode Selection
-
-User chooses:
-
-AI signals only (manual execution)
-
-fully automated AI trading
-
-automated trading via user-defined rules
-
-AI Signals
-
-NeuroTrade scans The Graph data feeds.
-
-Generates signals like:
-
-“BUY ETH on Arbitrum at $3,300. Confidence: 92%.”
-
-User can manually execute the trade.
-
-Fully Automated AI Trading
-
-NeuroTrade’s AI decides and executes trades without user intervention.
-
-Executes cross-chain transactions via LayerZero.
-
-User-Defined Rules
-
-User sets rules such as:
-
-“Buy ETH on Ethereum if price ≤ $2,400, sell if ≥ $2,600.”
-
-NeuroTrade stores rules securely in Oasis ROFL.
-
-Monitors onchain data via The Graph.
-
-Executes trades automatically when conditions are met.
-
-Cross-Chain Execution
-
-Trades are performed across chains using LayerZero.
-
-Ensures best prices and liquidity utilization.
-
-Clear Signing
-
-For any manual or auto-triggered trade, NeuroTrade optionally prompts Ledger for clear signing using ERC-7730.
-
-Private Payments (Optional)
-
-Users can pay NeuroTrade fees or subscribe privately via INTMAX.
-
-## 🤖 NeuroTrade AI Agent (Live Implementation)
-
-The NeuroTrade AI Agent is now live and ready for use! This is the core AI component that powers the trading intelligence.
-
-**📁 Agent Location**: `neurotrade_ai_agent/` folder
-
-### 🚀 Quick Start
-
-1. **Navigate to AI Agent Folder:**
+# NeuroTrade.eth - The Graph MCP AI Agent
+
+🚀 **Advanced AI Trading Agent** with real-time blockchain data from The Graph MCP (Model Context Protocol) server.
+
+## 🔥 Features
+
+- 🌐 **Real-time blockchain data** via The Graph MCP SSE connection
+- 🤖 **AI-powered trading analysis** with natural language queries
+- 📊 **Multi-chain support** (Ethereum, Arbitrum, Polygon, Optimism, Base)
+- 🔍 **Advanced indexer metrics** and network statistics
+- 💬 **Chat interface** with AgentChatProtocol v0.3.0
+- 📈 **Token price tracking** with fallback systems
+- 🎯 **Smart query dispatcher** for optimal tool selection
+
+## 🛠️ Architecture
+
+```
+User Query → Agent → The Graph MCP (SSE) → Indexer/Token Data → AI Analysis → Response
+                        ↓ (fallback)
+                   CoinGecko API
+```
+
+## 🚀 Quick Start
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/yourusername/neurotrade.eth.git
+cd neurotrade.eth
+```
+
+### 2. Environment Setup
+```bash
+# Copy template and add your JWT token
+cp env_template.txt .env
+
+# Edit .env and add your JWT token:
+# GRAPH_JWT=eyJhbGciOiJLTVNFUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Test Connection
+```bash
+# Quick test
+python quick_mcp_test.py
+
+# Comprehensive test
+cd neurotrade_ai_agent
+python test_graph_mcp.py
+```
+
+### 5. Run Agent
+```bash
+cd neurotrade_ai_agent
+python neurotrade_agent.py
+```
+
+## 🔧 The Graph MCP Integration
+
+### SSE Connection
+- **Endpoint**: `https://token-api.mcp.thegraph.com/sse`
+- **Protocol**: Server-Sent Events (SSE)
+- **Authentication**: JWT Bearer token
+
+### Available Tools
+- `get_token_data` - Token information and pricing
+- `get_indexer_info` - Indexer metrics and performance
+- `get_allocations` - Allocation data for indexers
+- `get_network_stats` - The Graph network statistics
+
+### Query Examples
+```python
+# Token queries
+"ETH token data"
+"What's the price of USDC?"
+
+# Indexer queries
+"Show me indexer information"
+"Get indexer metrics"
+
+# Network queries
+"The Graph network statistics"
+"Network stats"
+
+# Allocation queries
+"Show allocation data"
+"Get allocations for indexer"
+```
+
+## 💬 Chat Interface
+
+The agent supports natural language queries through the chat interface:
+
+```
+🤖 NeuroTrade AI: Hello! I can help you with:
+• Token prices and data
+• The Graph indexer information
+• Network statistics
+• Allocation data
+• Trading analysis
+
+User: "Show me ETH price"
+🤖 NeuroTrade AI: 💰 **Token Data**
+Current ETH price: $2,547.32
+24h change: +2.4%
+Network: Ethereum
+Source: The Graph MCP
+```
+
+## 🧪 Testing
+
+### Quick Connection Test
+```bash
+python quick_mcp_test.py
+```
+
+### Comprehensive Test Suite
+```bash
+cd neurotrade_ai_agent
+python test_graph_mcp.py
+```
+
+### Interactive Testing
+```bash
+# Run interactive test mode
+python test_graph_mcp.py
+# Select option 3 for interactive mode
+```
+
+## 📊 Data Sources
+
+1. **Primary**: The Graph MCP Server
+   - Real-time blockchain data
+   - Indexer metrics
+   - Network statistics
+
+2. **Fallback**: CoinGecko API
+   - Token prices
+   - Market data
+   - Emergency fallback
+
+## 🔒 Security
+
+- JWT token authentication
+- Secure SSE connections
+- Error handling with fallbacks
+- Rate limiting protection
+
+## 📈 Performance
+
+- Persistent SSE connections
+- Efficient tool dispatch
+- Caching for frequent queries
+- Parallel data fetching
+
+## 🛡️ Error Handling
+
+The agent includes comprehensive error handling:
+
+- **Connection failures**: Automatic fallback to CoinGecko
+- **JWT expiration**: Clear error messages
+- **Tool unavailable**: Graceful degradation
+- **Rate limiting**: Automatic retry with backoff
+
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+# Required
+GRAPH_JWT=your_jwt_token
+
+# Optional
+AGENT_SEED=neurotrade_ai_agent_seed_2024
+AGENT_PORT=8001
+USE_AGENTVERSE=true
+```
+
+### Advanced Configuration
+```python
+# Custom MCP server URL
+GRAPH_MCP_URL="https://token-api.mcp.thegraph.com"
+GRAPH_MCP_SSE_URL="https://token-api.mcp.thegraph.com/sse"
+```
+
+## 📚 API Reference
+
+### GraphMCPClient
+```python
+from graph_mcp_client import GraphMCPClient
+
+client = GraphMCPClient()
+await client.initialize_session()  # Start SSE connection
+tools = await client.list_tools()  # Get available tools
+result = await client.call_tool("get_token_data", {"symbol": "ETH"})
+await client.close()  # Clean up
+```
+
+### GraphMCPQueryDispatcher
+```python
+from graph_mcp_client import GraphMCPQueryDispatcher
+
+dispatcher = GraphMCPQueryDispatcher(client)
+response = await dispatcher.dispatch_query("ETH price")
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **JWT Token Not Found**
    ```bash
-   cd neurotrade_ai_agent
+   ❌ GRAPH_JWT not found in environment!
+   💡 Add your JWT token to .env file
    ```
 
-2. **Install Dependencies:**
+2. **SSE Connection Failed**
    ```bash
-   pip install -r requirements.txt
+   ❌ SSE connection failed - check your JWT token
+   💡 Verify token is valid and not expired
    ```
 
-3. **Set Up Environment (Optional):**
+3. **No Tools Available**
    ```bash
-   cp env_template.txt .env
-   # Edit .env with your configuration
+   ❌ No tools found
+   💡 Check MCP server status and JWT permissions
    ```
 
-4. **Run the Agent:**
-   ```bash
-   python neurotrade_agent.py
-   ```
+### Debug Mode
+```bash
+# Enable debug logging
+export PYTHONPATH=.
+python -c "
+import logging
+logging.basicConfig(level=logging.DEBUG)
+# Run your tests
+"
+```
 
-4. **Find it on ASI:One:**
-   - Visit https://asi1.ai
-   - Search for "NeuroTrade" or "trading"
-   - Start chatting with the AI agent!
+## 🤝 Contributing
 
-### 🎯 What the AI Agent Can Do
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Submit a pull request
 
-**Price Analysis:**
-- "What's the current ETH price?"
-- "Analyze market conditions for ETH"
+## 📄 License
 
-**Trading Recommendations:**
-- "Should I buy ETH now?"
-- "Is it a good time to sell?"
-- "Give me a trading signal for USDC/ETH"
+MIT License - see LICENSE file for details
 
-**Cross-Chain Analysis:**
-- "Best chain for ETH trading?"
-- "Cross-chain opportunities available?"
+## 🔗 Links
 
-**Swap Analysis:**
-- "Should I swap USDC to ETH?"
-- "Compare DEX rates for my trade"
-
-### 📊 AI Agent Features
-
-- **Real-time Market Data**: Fetches live prices via The Graph Protocol
-- **Multi-Chain Support**: Ethereum, Arbitrum, Polygon, Optimism, Base
-- **Intelligent Recommendations**: AI-powered trading suggestions
-- **ASI:One Integration**: Discoverable by real users
-- **Natural Language Processing**: Understands complex trading queries
-- **Risk Assessment**: Evaluates market conditions and trading risks
-
-### 🔧 Technical Implementation
-
-The AI Agent is built with:
-- **Fetch.AI uAgents Framework**: Core agent functionality
-- **The Graph Protocol**: Real-time blockchain data
-- **Agentverse Integration**: Hosted and discoverable
-- **Python Backend**: Robust and scalable architecture
-
-See `NeuroTrade_AI_Agent_README.md` for detailed documentation.
+- [The Graph](https://thegraph.com/)
+- [The Graph MCP Documentation](https://docs.thegraph.com/mcp/)
+- [uAgents Framework](https://github.com/fetchai/uAgents)
+- [MCP Protocol](https://modelcontextprotocol.io/)
 
 ---
 
-Features
-
-Hybrid trading system:
-
-manual AI signals
-
-fully automated AI trades
-
-user-defined trading rules
-
-Cross-chain asset management
-
-Private AI compute for sensitive trading logic
-
-User-friendly UI with embedded wallet auth
-
-ENS identity for seamless user trust
-
-Clear signing for transaction safety
-
-
-
-
-
-Setup & Running
-
-Frontend: React.js or Next.js
-
-Styling: TailwindCSS
-
-Auth & Wallet: Privy SDK
-
-Agent Logic: Fetch.AI SDK
-
-Data Feeds: The Graph (GraphQL)
-
-Cross-Chain Execution: LayerZero SDK
-
-Private Compute: Oasis ROFL SDK
-
-ENS Integration: ethers.js or ENS.js
-
-Hardware Signing: Ledger SDK
-
-Steps to Run (Example Flow)
-
-Clone repo
-
-Install dependencies
-
-Configure .env for:
-
-LayerZero endpoints
-
-Oasis API keys
-
-Privy credentials
-
-Run local server:
-
-npm run dev
-
-Deploy smart contracts on:
-
-LayerZero testnets
-
-Target chains (e.g. Arbitrum, Base)
-
-Deploy ROFL service on Oasis
-
-Future Improvements
-
-Support additional AI models for trading logic
-
-Integration with additional chains
-
-Voice or natural language input for rule creation
-
-Deeper analytics and charting tools
-
-NeuroTrade.eth represents the next leap in decentralized trading:
-
-A truly omnichain, intelligent, private trading agent — designed for both security and innovation.
-
-Let’s build the future of trading together!
+**NeuroTrade.eth** - Powered by The Graph MCP 🚀

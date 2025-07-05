@@ -1,0 +1,12 @@
+# The Graph MCP JWT Token
+# Copy this file to .env and add your JWT token
+# Format: GRAPH_JWT=eyJhbGciOiJLTVNFUzI1NiIsInR5cCI6IkpXVCJ9...
+GRAPH_JWT=your_jwt_token_here
+
+# Agent Configuration
+AGENT_SEED=neurotrade_ai_agent_seed_2024
+AGENT_PORT=8001
+USE_AGENTVERSE=true
+
+# Optional: Agent Mailbox Key for Agentverse hosting
+# AGENT_MAILBOX_KEY=your_mailbox_key_here 
