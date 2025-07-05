@@ -3,3 +3,6 @@ node_modules/
 .env
 .next
 config.py
+config.py
+.env
+.next
