@@ -355,34 +355,27 @@ async def handle_generic_message(ctx: Context, sender: str, msg: GenericMessage)
     except Exception as e:
         ctx.logger.error(f"Error in generic message handler: {e}")
 
-# 🎯 NEUROTRADE CUSTOM CHAT PROTOCOL INTEGRATION
+# 🎯 EXACT CHAT PROTOCOL INTEGRATION (Claude Agent Compatible)
 try:
-    from neurotrade_chat_protocol import neurotrade_chat_protocol
-    neurotrade_agent.include(neurotrade_chat_protocol, publish_manifest=True)
-    print("🚀 NeuroTrade Custom Chat Protocol loaded successfully!")
-    print("🎯 Protocol Name: NeurotradeChatProtocol v1.0.0")
+    from exact_chat_protocol import exact_chat_protocol
+    neurotrade_agent.include(exact_chat_protocol, publish_manifest=True)
+    print("🚀 EXACT Chat Protocol loaded successfully!")
+    print("🎯 Protocol: AgentChatProtocol v0.3.0")
+    print("🔑 Digest: proto:30a801ed3a83f9a0ff0a9f1e6fe958cb91da1fc2218b153df7b6cbf87bd33d62")
     print("✅ Agent should now show 'Chat with Agent' button!")
-    print("💬 Custom chat functionality fully enabled!")
+    print("💬 Claude-compatible chat functionality enabled!")
 except Exception as e:
-    print(f"⚠️ NeuroTrade Custom Chat Protocol failed: {e}")
+    print(f"⚠️ EXACT Chat Protocol failed: {e}")
     print("💡 Trying fallback protocols...")
     
-    # Fallback 1: Simple chat protocol
+    # Fallback 1: Custom protocol
     try:
-        from simple_chat_protocol import simple_chat_proto
-        neurotrade_agent.include(simple_chat_proto, publish_manifest=True)
-        print("✅ Simple chat protocol loaded!")
+        from neurotrade_chat_protocol import neurotrade_chat_protocol
+        neurotrade_agent.include(neurotrade_chat_protocol, publish_manifest=True)
+        print("✅ Custom chat protocol loaded!")
     except Exception as e2:
-        print(f"⚠️ Simple chat protocol failed: {e2}")
-        
-        # Fallback 2: Minimal chat protocol (if exists)
-        try:
-            from minimal_chat_protocol import chat_proto
-            neurotrade_agent.include(chat_proto, publish_manifest=True)
-            print("✅ Minimal chat protocol loaded!")
-        except Exception as e3:
-            print(f"❌ All chat protocols failed: {e3}")
-            print("💡 Agent will run without chat capabilities")
+        print(f"❌ All chat protocols failed: {e2}")
+        print("💡 Agent will run without chat capabilities")
 
 def signal_handler(signum, frame):
     """Handle shutdown signals gracefully"""
