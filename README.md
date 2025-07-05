@@ -192,6 +192,72 @@ Private Payments (Optional)
 
 Users can pay NeuroTrade fees or subscribe privately via INTMAX.
 
+## 🤖 NeuroTrade AI Agent (Live Implementation)
+
+The NeuroTrade AI Agent is now live and ready for use! This is the core AI component that powers the trading intelligence.
+
+### 🚀 Quick Start
+
+1. **Set up the AI Agent:**
+   ```bash
+   python setup.py
+   ```
+
+2. **Test the Agent:**
+   ```bash
+   python test_agent.py
+   ```
+
+3. **Run the Agent:**
+   ```bash
+   python neurotrade_agent.py
+   ```
+
+4. **Find it on ASI:One:**
+   - Visit https://asi1.ai
+   - Search for "NeuroTrade" or "trading"
+   - Start chatting with the AI agent!
+
+### 🎯 What the AI Agent Can Do
+
+**Price Analysis:**
+- "What's the current ETH price?"
+- "Analyze market conditions for ETH"
+
+**Trading Recommendations:**
+- "Should I buy ETH now?"
+- "Is it a good time to sell?"
+- "Give me a trading signal for USDC/ETH"
+
+**Cross-Chain Analysis:**
+- "Best chain for ETH trading?"
+- "Cross-chain opportunities available?"
+
+**Swap Analysis:**
+- "Should I swap USDC to ETH?"
+- "Compare DEX rates for my trade"
+
+### 📊 AI Agent Features
+
+- **Real-time Market Data**: Fetches live prices via The Graph Protocol
+- **Multi-Chain Support**: Ethereum, Arbitrum, Polygon, Optimism, Base
+- **Intelligent Recommendations**: AI-powered trading suggestions
+- **ASI:One Integration**: Discoverable by real users
+- **Natural Language Processing**: Understands complex trading queries
+- **Risk Assessment**: Evaluates market conditions and trading risks
+
+### 🔧 Technical Implementation
+
+The AI Agent is built with:
+- **Fetch.AI uAgents Framework**: Core agent functionality
+- **The Graph Protocol**: Real-time blockchain data
+- **Agentverse Integration**: Hosted and discoverable
+- **Python Backend**: Robust and scalable architecture
+
+See `NeuroTrade_AI_Agent_README.md` for detailed documentation.
+
+---
+
 Features
 
 Hybrid trading system:
