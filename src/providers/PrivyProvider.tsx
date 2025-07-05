@@ -2,6 +2,7 @@
 import { PrivyProvider as Provider } from '@privy-io/react-auth';
 import { ReactNode } from 'react';
 import { mainnet, goerli, polygon, arbitrum, optimism, base } from 'viem/chains';
+import logo from '../assets/images/logo.png';
 
 interface PrivyProviderProps {
   children: ReactNode;
@@ -19,15 +20,10 @@ export function PrivyProvider({ children }: PrivyProviderProps) {
           landingHeader: "NeuroTrade.eth",
           loginMessage: "Welcome to new age for trading.",
           showWalletLoginFirst: false,
-          logo: 'https://img.freepik.com/free-psd/gradient-abstract-logo_23-2150689652.jpg?semt=ais_hybrid&w=740',
+          logo: logo.src,
         },
         embeddedWallets: {
-            ethereum: {
-                createOnLogin: 'users-without-wallets',
-            },
-            solana: {
-                createOnLogin: 'users-without-wallets',
-            }
+            createOnLogin: 'users-without-wallets',
         },
         defaultChain: mainnet,
         supportedChains: [
@@ -39,9 +35,9 @@ export function PrivyProvider({ children }: PrivyProviderProps) {
           base
         ],
         externalWallets: {
-          metamask: true,
-          walletConnect: true,
-          coinbaseWallet: true,
+          metamask: { enabled: true },
+          walletConnect: { enabled: true },
+          coinbaseWallet: { connectionOptions: 'all' },
         },
       }}
     >

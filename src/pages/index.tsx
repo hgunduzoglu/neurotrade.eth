@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { usePrivy } from '@privy-io/react-auth';
 import { WagmiConfig } from 'wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -8,7 +10,12 @@ import { TextRecords } from '@/components/TextRecords';
 import Link from 'next/link';
 
 export default function Home() {
+  const router = useRouter();
   const { login, logout, authenticated, user } = usePrivy();
+
+  useEffect(() => {
+    router.replace('/homepage');
+  }, [router]);
 
   // Get the first embedded wallet address if available
   const walletAddress = user?.linkedAccounts?.find(
@@ -18,61 +25,6 @@ export default function Home() {
   // Convert email to string safely
   const emailString = user?.email?.toString() || 'User';
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <WagmiConfig config={config}>
-        <div className={styles.container}>
-          <main className={styles.main}>
-            <title>NeuroTrade.eth</title>
-            <h1 className={styles.title}>
-              Welcome to NeuroTrade.eth
-            </h1>
-
-            {!authenticated ? (
-              <button onClick={login} className={styles.button}>
-                Login with Email
-              </button>
-            ) : (
-              <div className={styles.userInfo}>
-                <h2>Welcome, {emailString}</h2>
-                <p>User ID: {user?.id}</p>
-                <p>Wallet Address: {walletAddress}</p>
-                
-                {/* ENS Profile */}
-                <div className={styles.ensSection}>
-                  <h3>Your ENS Profile</h3>
-                  <EnsProfile />
-                </div>
-
-                {/* ENS Text Records */}
-                <div className={styles.ensSection}>
-                  <h3>ENS Text Records</h3>
-                  <TextRecords 
-                    name="neurotrade.eth"
-                    keys={[
-                      'ai_agent_version',
-                      'supported_chains',
-                      'description',
-                      'url'
-                    ]} 
-                  />
-                </div>
-
-                <button onClick={logout} className={`${styles.button} ${styles.logoutButton}`}>
-                  Logout
-                </button>
-              </div>
-            )}
-
-            <div className={styles.grid}>
-              <Link href="/swap" className={styles.card}>
-                <h2>Swap &rarr;</h2>
-                <p>Swap your tokens using 1inch Fusion+</p>
-              </Link>
-            </div>
-          </main>
-        </div>
-      </WagmiConfig>
-    </QueryClientProvider>
-  );
+  // Return null or a loading state while redirecting
+  return null;
 } 

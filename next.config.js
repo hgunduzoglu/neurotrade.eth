@@ -9,6 +9,9 @@ const nextConfig = {
       'cdn.1inch.io'
     ],
   },
+  env: {
+    MORALIS_API_KEY: process.env.MORALIS_API_KEY,
+  },
 }
 
 module.exports = nextConfig 

@@ -1,0 +1,95 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  color: white;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+.walletSection {
+  display: flex;
+  align-items: center;
+}
+
+.connectButton {
+  background: linear-gradient(to right, #00ffff, #ee82ee);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: black;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.connectButton:hover {
+  transform: scale(1.05);
+}
+
+.userInfo {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.chatSection {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.chatContainer {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+
+.chatContainer h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(to right, #00ffff, #ee82ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.inputContainer {
+  margin-top: 2rem;
+}
+
+.chatInput {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.chatInput:focus {
+  outline: none;
+  border-color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.todoNote {
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+} 
