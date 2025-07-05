@@ -1,15 +1,17 @@
 # NeuroTrade AI Agent 🤖
 
-An AI-powered trading agent built with Fetch.AI uAgents framework that provides intelligent trading recommendations and market analysis.
+An AI-powered trading agent built with Fetch.AI uAgents framework that provides intelligent trading recommendations and market analysis. **Now with full ASI:One Chat Protocol support!**
 
 ## 🚀 Features
 
-- **AI-Powered Trading Recommendations**: Analyzes market data and provides intelligent trading suggestions
-- **Multi-Chain Support**: Supports Ethereum, Arbitrum, Polygon, Optimism, and Base networks
-- **The Graph Integration**: Fetches real-time blockchain data for accurate market analysis
-- **Cross-Chain Analysis**: Provides recommendations for cross-chain trading opportunities
-- **ASI:One Compatible**: Discoverable through https://asi1.ai for real users
-- **Real-Time Market Data**: Continuously updates market prices and trends
+- **🗣️ ASI:One Chat Protocol**: Full natural language chat support through ASI:One interface
+- **🤖 AI-Powered Trading Recommendations**: Analyzes market data and provides intelligent trading suggestions
+- **🌐 Multi-Chain Support**: Supports Ethereum, Arbitrum, Polygon, Optimism, and Base networks
+- **📊 The Graph Integration**: Fetches real-time blockchain data for accurate market analysis
+- **🔄 Cross-Chain Analysis**: Provides recommendations for cross-chain trading opportunities
+- **🌍 ASI:One Compatible**: Discoverable and chattable through https://asi1.ai for real users
+- **⏰ Real-Time Market Data**: Continuously updates market prices and trends
+- **🧠 Structured Output Processing**: Uses OpenAI agent for intelligent query parameter extraction
 
 ## 🛠️ Installation
 
@@ -31,25 +33,32 @@ An AI-powered trading agent built with Fetch.AI uAgents framework that provides 
    ```bash
    pip install -r requirements.txt
    ```
+   
+   **Dependencies include:**
+   - `uagents`: Core agent framework
+   - `uagents-core`: Chat protocol support
+   - `aiohttp`: HTTP client for API calls
+   - `requests`: HTTP requests library
+   - `python-dotenv`: Environment variable management
 
-3. **Configure environment variables:**
+3. **Configure environment variables (optional):**
    
    Create a `.env` file in the root directory:
    ```env
-   AGENT_MAILBOX_KEY=your_mailbox_key_here
    AGENT_SEED=neurotrade_ai_agent_seed_2024
    AGENT_PORT=8000
    LOG_LEVEL=INFO
+   USE_AGENTVERSE=true
    ```
 
-   - `AGENT_MAILBOX_KEY`: Your Agentverse mailbox key (required for ASI:One discovery)
    - `AGENT_SEED`: Unique seed for your agent (can be customized)
    - `AGENT_PORT`: Port for the agent to run on (default: 8000)
+   - `USE_AGENTVERSE`: Enable Agentverse hosting (default: true)
 
-4. **Get your Agentverse Mailbox Key:**
-   - Visit [Agentverse.ai](https://agentverse.ai)
-   - Create an account and get your mailbox key
-   - Add it to your `.env` file
+4. **No Additional Setup Required:**
+   - No mailbox key needed
+   - Agent automatically configured for Agentverse hosting
+   - "Chat with Agent" button will appear automatically
 
 ## 🎯 Usage
 
@@ -110,15 +119,45 @@ The NeuroTrade AI Agent can handle various types of trading queries:
 }
 ```
 
-## 🔗 ASI:One Integration
+## 🔗 ASI:One Chat Integration
 
-The agent is designed to be discoverable on ASI:One at https://asi1.ai. Users can:
+**🎉 NEW: Full Chat Protocol Support!**
 
-1. Visit ASI:One platform
-2. Search for "NeuroTrade" or "trading"
-3. Connect to the agent
-4. Start asking trading-related questions
-5. Receive AI-powered recommendations
+The agent now supports full natural language conversation through ASI:One's chat interface:
+
+### 💬 How to Chat with NeuroTrade AI
+
+1. **Visit ASI:One:** https://asi1.ai
+2. **Enable Agents:** Toggle the "Agents" switch on
+3. **Search:** Look for "NeuroTrade" or search "trading"
+4. **Start Chatting:** Ask questions in natural language!
+
+### 🗣️ Natural Language Examples
+
+**Instead of structured queries, just ask naturally:**
+
+- ❓ "What's the current price of Ethereum?"
+- ❓ "Should I buy ETH right now given market conditions?"
+- ❓ "I want to swap 1000 USDC to ETH, is this a good time?"
+- ❓ "Which blockchain has the best liquidity for trading ETH?"
+- ❓ "Give me analysis on cross-chain trading opportunities"
+- ❓ "Is the crypto market bullish or bearish today?"
+
+### 🤖 Chat Features
+
+- **🧠 Smart Parameter Extraction**: Uses OpenAI agent to understand your intent
+- **📝 Structured Responses**: Get formatted, easy-to-read trading analysis
+- **💬 Session Management**: Maintains conversation context
+- **🚀 Real-time Processing**: Live market data in every response
+- **🌍 Multi-language Support**: Ask questions naturally
+
+### 🔄 Chat Flow
+
+1. **You ask:** "Should I buy ETH now?"
+2. **AI processes:** Extracts intent and parameters
+3. **Market analysis:** Fetches live ETH price and market data
+4. **Smart response:** Returns formatted trading recommendation
+5. **Interactive:** Continue the conversation with follow-up questions
 
 ## 📊 The Graph Integration
 
@@ -134,18 +173,23 @@ The agent integrates with The Graph Protocol to fetch real-time blockchain data:
 ```
 NeuroTrade AI Agent
 ├── neurotrade_agent.py     # Main agent implementation
+├── chat_protocol.py        # ASI:One chat protocol handler
 ├── config.py               # Configuration management
 ├── requirements.txt        # Python dependencies
+├── test_agent.py           # Testing utilities
+├── setup.py                # Installation script
 └── README.md              # This documentation
 ```
 
 ### Key Components
 
 1. **Agent Core**: Built on Fetch.AI uAgents framework
-2. **Trading Data Manager**: Handles market data fetching and analysis
-3. **AI Recommendation Engine**: Generates trading recommendations
-4. **Protocol Handler**: Manages message routing and responses
-5. **The Graph Client**: Fetches blockchain data via GraphQL
+2. **Chat Protocol Handler**: Processes natural language queries from ASI:One
+3. **Trading Data Manager**: Handles market data fetching and analysis
+4. **AI Recommendation Engine**: Generates trading recommendations
+5. **Structured Output Client**: Interfaces with OpenAI agent for parameter extraction
+6. **The Graph Client**: Fetches blockchain data via GraphQL
+7. **Multi-Protocol Support**: Handles both direct API calls and chat messages
 
 ## 🌐 Supported Networks
 
@@ -179,6 +223,49 @@ This AI agent provides trading suggestions for educational and informational pur
 ## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🧪 Testing
+
+### Running Tests
+
+1. **Simple Chat Protocol Tests (Recommended):**
+   ```bash
+   python test_simple_chat.py
+   ```
+   This tests the simple chat protocol that avoids the "locked protocol" error.
+
+2. **Agent Functionality Tests:**
+   ```bash
+   python test_agent.py
+   ```
+   Tests the core agent functionality and trading features.
+
+3. **Legacy Chat Protocol Tests:**
+   ```bash
+   python test_chat_protocol.py
+   ```
+   **Note**: If you encounter "Cannot add interaction to locked protocol" errors, use the simple chat protocol instead.
+
+### Troubleshooting Common Issues
+
+**"Locked Protocol" Error:**
+- This occurs when trying to modify an already registered protocol
+- Solution: Use the simple chat protocol (`simple_chat_protocol.py`) instead
+- The agent automatically loads the simple chat protocol for compatibility
+
+**Import Errors:**
+- Ensure all dependencies are installed: `pip install -r requirements.txt`
+- Check Python version compatibility (3.10+ required)
+
+**Connection Issues:**
+- Check internet connection for API calls
+- Ensure port 8000 is available or change `AGENT_PORT` in `.env`
+- Verify endpoint is set to `https://agentverse.ai/v1/submit`
+
+**Agent Not Showing as "Hosted":**
+- Ensure `mailbox=True` is set
+- Check that endpoint points to Agentverse
+- Restart the agent completely
 
 ## 🤝 Contributing
 

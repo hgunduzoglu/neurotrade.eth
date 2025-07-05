@@ -20,8 +20,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Agent configuration
-AGENT_MAILBOX_KEY = os.getenv("AGENT_MAILBOX_KEY", "")
 AGENT_SEED = os.getenv("AGENT_SEED", "neurotrade_ai_agent_seed_2024")
+AGENT_PORT = int(os.getenv("AGENT_PORT", "8001"))
+USE_AGENTVERSE = os.getenv("USE_AGENTVERSE", "true").lower() == "true"
 
 # The Graph endpoints for different chains
 GRAPH_ENDPOINTS = {
@@ -31,14 +32,27 @@ GRAPH_ENDPOINTS = {
     "optimism": "https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis"
 }
 
-# Create the NeuroTrade AI Agent
-neurotrade_agent = Agent(
-    name="NeuroTrade AI Agent",
-    seed=AGENT_SEED,
-    mailbox=True,  # Enable mailbox for Agentverse connection
-    port=8000,
-    endpoint=["http://localhost:8000/submit"],
-)
+# Create the NeuroTrade AI Agent with proper mailbox configuration
+if True:
+    # Use Agentverse mailbox for hosted agent
+    neurotrade_agent = Agent(
+        name="NeuroTrade",
+        seed=AGENT_SEED,
+        mailbox=True,
+        port=AGENT_PORT,
+        endpoint="https://agentverse.ai/v1/submit"
+    )
+    print("🌐 Agent configured with Agentverse mailbox")
+else:
+    # Fallback to local agent with mailbox enabled
+    neurotrade_agent = Agent(
+        name="NeuroTrade",
+        seed=AGENT_SEED,
+        mailbox=True,
+        port=AGENT_PORT,
+        endpoint=f"http://localhost:{AGENT_PORT}/submit",
+    )
+    print("⚠️ Agent configured locally - add AGENT_MAILBOX_KEY for Agentverse hosting")
 
 # Fund the agent if needed (with error handling)
 try:
@@ -293,10 +307,10 @@ async def startup_event(ctx: Context):
     ctx.logger.info("🚀 NeuroTrade AI Agent starting up...")
     ctx.logger.info(f"Agent address: {neurotrade_agent.address}")
     
-    if AGENT_MAILBOX_KEY:
-        ctx.logger.info("📬 Mailbox configured - agent will be discoverable on ASI:One")
-    else:
-        ctx.logger.warning("⚠️ No mailbox key provided - agent will run locally only")
+    ctx.logger.info("📬 Mailbox enabled - agent will be discoverable on ASI:One")
+    ctx.logger.info("🌐 Agent configured as 'Hosted' with 'Chat with Agent' button")
+    ctx.logger.info("🔗 Chat functionality enabled via Agentverse endpoint")
+    ctx.logger.info("🎯 Agent should appear as: Running, Hosted, Mailnet")
     
     ctx.logger.info("✅ NeuroTrade AI Agent ready for trading queries!")
     
@@ -341,8 +355,34 @@ async def handle_generic_message(ctx: Context, sender: str, msg: GenericMessage)
     except Exception as e:
         ctx.logger.error(f"Error in generic message handler: {e}")
 
-# Protocol handlers moved to direct agent handlers to avoid duplicate model registration
-# neurotrade_agent.include(trading_protocol)
+# 🎯 NEUROTRADE CUSTOM CHAT PROTOCOL INTEGRATION
+try:
+    from neurotrade_chat_protocol import neurotrade_chat_protocol
+    neurotrade_agent.include(neurotrade_chat_protocol, publish_manifest=True)
+    print("🚀 NeuroTrade Custom Chat Protocol loaded successfully!")
+    print("🎯 Protocol Name: NeurotradeChatProtocol v1.0.0")
+    print("✅ Agent should now show 'Chat with Agent' button!")
+    print("💬 Custom chat functionality fully enabled!")
+except Exception as e:
+    print(f"⚠️ NeuroTrade Custom Chat Protocol failed: {e}")
+    print("💡 Trying fallback protocols...")
+    
+    # Fallback 1: Simple chat protocol
+    try:
+        from simple_chat_protocol import simple_chat_proto
+        neurotrade_agent.include(simple_chat_proto, publish_manifest=True)
+        print("✅ Simple chat protocol loaded!")
+    except Exception as e2:
+        print(f"⚠️ Simple chat protocol failed: {e2}")
+        
+        # Fallback 2: Minimal chat protocol (if exists)
+        try:
+            from minimal_chat_protocol import chat_proto
+            neurotrade_agent.include(chat_proto, publish_manifest=True)
+            print("✅ Minimal chat protocol loaded!")
+        except Exception as e3:
+            print(f"❌ All chat protocols failed: {e3}")
+            print("💡 Agent will run without chat capabilities")
 
 def signal_handler(signum, frame):
     """Handle shutdown signals gracefully"""

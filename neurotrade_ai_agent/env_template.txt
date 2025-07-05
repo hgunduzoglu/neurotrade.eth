@@ -1,0 +1,48 @@
+# NeuroTrade AI Agent - Environment Configuration Template
+# Copy this content to a new file named .env and customize if needed
+
+# =============================================================================
+# AGENT CONFIGURATION (Optional)
+# =============================================================================
+
+# Agent seed - keeps the same agent address across restarts
+AGENT_SEED=neurotrade_ai_agent_seed_2024
+
+# Port for the agent to run on
+AGENT_PORT=8000
+
+# Log level (DEBUG, INFO, WARNING, ERROR)
+LOG_LEVEL=INFO
+
+# Use Agentverse hosting (true/false)
+USE_AGENTVERSE=true
+
+# =============================================================================
+# CHAT WITH AGENT BUTTON NASIL AKTİF EDİLİR
+# =============================================================================
+# 
+# Artık mailbox key gerekmez! Sadece:
+# 1. Agent'ı çalıştırın: python neurotrade_agent.py
+# 2. Agentverse'de otomatik olarak "Hosted" görünecek
+# 3. "Chat with Agent" butonu aktif olacak
+# 4. ASI:One'da keşfedilebilir olacak
+#
+# Agent endpoint: https://agentverse.ai/v1/submit
+# Mailbox: Otomatik aktif
+#
+# =============================================================================
+
+# BAŞARILI KONFİGÜRASYON SONRASI:
+# - Status: Running (yeşil)
+# - Type: Hosted (mavi)  
+# - Network: Mailnet (mavi)
+# - Chat Button: "Chat with Agent" görünür
+# - ASI:One: Discoverable ve chattable
+
+# ⚠️ OPSIYONEL: The Graph API key (rate limit artırır)
+# https://thegraph.com/studio/ -> API Key
+GRAPH_API_KEY=
+
+# ⚠️ OPSIYONEL: Diğer ayarlar
+MIN_LIQUIDITY_USD=10000
+DEFAULT_SLIPPAGE=0.5 

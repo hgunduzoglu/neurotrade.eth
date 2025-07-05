@@ -196,19 +196,27 @@ Users can pay NeuroTrade fees or subscribe privately via INTMAX.
 
 The NeuroTrade AI Agent is now live and ready for use! This is the core AI component that powers the trading intelligence.
 
+**📁 Agent Location**: `neurotrade_ai_agent/` folder
+
 ### 🚀 Quick Start
 
-1. **Set up the AI Agent:**
+1. **Navigate to AI Agent Folder:**
    ```bash
-   python setup.py
+   cd neurotrade_ai_agent
    ```
 
-2. **Test the Agent:**
+2. **Install Dependencies:**
    ```bash
-   python test_agent.py
+   pip install -r requirements.txt
    ```
 
-3. **Run the Agent:**
+3. **Set Up Environment (Optional):**
+   ```bash
+   cp env_template.txt .env
+   # Edit .env with your configuration
+   ```
+
+4. **Run the Agent:**
    ```bash
    python neurotrade_agent.py
    ```
