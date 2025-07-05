@@ -40,7 +40,6 @@ Aşağıda tüm proje geliştirme adımları sırasıyla anlatılmıştır.
 2. Privy Provider ile uygulamayı sarmala (React Context gibi)
 3. Login modal aç:
    - email login
-   - Google, Twitter login
    - Metamask, Ledger gibi wallet connect
 4. Kullanıcı login olunca:
    - privy.user.id → kullanıcı kimliği

@@ -1,0 +1,132 @@
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+}
+
+.swapCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 480px;
+}
+
+.swapCard h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.inputGroup {
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.input, .select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus, .select:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+.select {
+  background-color: white;
+  cursor: pointer;
+}
+
+.switchButton {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 1rem auto;
+  border: none;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  color: #666;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.switchButton:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.1);
+}
+
+.swapButton {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background-color: #0070f3;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.swapButton:hover:not(:disabled) {
+  background-color: #0060df;
+}
+
+.swapButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.quoteInfo {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.error {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+.routeInfo {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.warning {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #b45309;
+  font-size: 0.9rem;
+} 
