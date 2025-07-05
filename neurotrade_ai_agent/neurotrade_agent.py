@@ -355,17 +355,17 @@ async def handle_generic_message(ctx: Context, sender: str, msg: GenericMessage)
     except Exception as e:
         ctx.logger.error(f"Error in generic message handler: {e}")
 
-# 🎯 EXACT CHAT PROTOCOL INTEGRATION (Claude Agent Compatible)
+# 🎯 OFFICIAL CHAT PROTOCOL INTEGRATION (Working Example)
 try:
-    from exact_chat_protocol import exact_chat_protocol
-    neurotrade_agent.include(exact_chat_protocol, publish_manifest=True)
-    print("🚀 EXACT Chat Protocol loaded successfully!")
-    print("🎯 Protocol: AgentChatProtocol v0.3.0")
-    print("🔑 Digest: proto:30a801ed3a83f9a0ff0a9f1e6fe958cb91da1fc2218b153df7b6cbf87bd33d62")
+    from chat_proto import chat_proto, struct_output_client_proto
+    neurotrade_agent.include(chat_proto, publish_manifest=True)
+    neurotrade_agent.include(struct_output_client_proto, publish_manifest=True)
+    print("🚀 Official Chat Protocol loaded successfully!")
+    print("🎯 Protocol: AgentChatProtocol v0.3.0 (Official)")
     print("✅ Agent should now show 'Chat with Agent' button!")
-    print("💬 Claude-compatible chat functionality enabled!")
+    print("💬 Full chat functionality enabled!")
 except Exception as e:
-    print(f"⚠️ EXACT Chat Protocol failed: {e}")
+    print(f"⚠️ Official Chat Protocol failed: {e}")
     print("💡 Trying fallback protocols...")
     
     # Fallback 1: Custom protocol
