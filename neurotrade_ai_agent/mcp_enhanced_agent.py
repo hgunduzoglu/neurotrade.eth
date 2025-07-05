@@ -84,7 +84,7 @@ class GraphToolResponse(Model):
 class TheGraphTradingData:
     """Enhanced trading data class with The Graph MCP integration"""
     
-    def __init__(self, thegraph_client: TheGraphMCPClient):
+    def __init__(self, thegraph_client: GraphMCPClient):
         self.thegraph_client = thegraph_client
         self.cache = {}
         self.last_update = None
