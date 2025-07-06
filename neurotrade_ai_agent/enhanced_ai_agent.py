@@ -247,31 +247,47 @@ class EnhancedTradingAnalyzer:
         return recommendations
     
     async def generate_trading_response(self, query: str, symbols: List[str] = None) -> str:
-        """Generate comprehensive trading response"""
+        """Generate a comprehensive trading response"""
         try:
-            if symbols is None:
+            query_lower = query.lower()
+            
+            # Extract symbols if not provided
+            if not symbols:
                 symbols = self._extract_symbols_from_query(query)
             
             if not symbols:
-                symbols = ["ETH"]  # Default to ETH
+                # Try to detect intent for default symbols
+                if "market" in query_lower or "overview" in query_lower:
+                    symbols = ["ETH", "BTC"]  # Default to major coins
+                elif "price" in query_lower:
+                    symbols = ["ETH"]  # Default to ETH
+                else:
+                    symbols = ["ETH"]  # Fallback
             
-            # Analyze each symbol
+            # Get analysis for each symbol
             analyses = {}
             for symbol in symbols:
-                analysis = await self.analyze_token(symbol)
-                if "error" not in analysis:
-                    analyses[symbol] = analysis
+                if symbol in self.supported_tokens:
+                    analysis = await self.analyze_token(symbol)
+                    if "error" not in analysis:
+                        analyses[symbol] = analysis
             
             if not analyses:
-                return "❌ **Error**: Could not analyze any tokens. Please try again later."
+                return "I apologize, but I couldn't analyze any of the requested tokens. Please try again with supported tokens like ETH, BTC, etc."
             
-            # Generate response based on query type
-            return self._format_response(query, analyses)
-            
+            # Format response based on query type
+            if len(analyses) == 1:
+                # Single token analysis
+                symbol = list(analyses.keys())[0]
+                return self._format_single_token_response(symbol, analyses[symbol], query_lower)
+            else:
+                # Multi-token analysis
+                return self._format_multi_token_response(analyses, query_lower)
+                
         except Exception as e:
             logger.error(f"Error generating trading response: {e}")
-            return f"❌ **Error**: Failed to generate analysis - {str(e)}"
-    
+            return "I encountered an error while analyzing the market. Please try again in a moment."
+            
     def _extract_symbols_from_query(self, query: str) -> List[str]:
         """Extract token symbols from query"""
         query_upper = query.upper()
@@ -283,109 +299,135 @@ class EnhancedTradingAnalyzer:
         
         return found_symbols[:3]  # Limit to 3 symbols
     
-    def _format_response(self, query: str, analyses: Dict) -> str:
-        """Format the response based on query and analyses"""
-        query_lower = query.lower()
-        
-        if len(analyses) == 1:
-            symbol = list(analyses.keys())[0]
-            analysis = analyses[symbol]
-            return self._format_single_token_response(symbol, analysis, query_lower)
-        else:
-            return self._format_multi_token_response(analyses, query_lower)
-    
     def _format_single_token_response(self, symbol: str, analysis: Dict, query_lower: str) -> str:
-        """Format response for a single token"""
-        price_data = analysis["price_data"]
-        technical = analysis["technical_indicators"]
-        sentiment = analysis["market_sentiment"]
-        signals = analysis["trading_signals"]
-        risk = analysis["risk_assessment"]
-        recommendations = analysis["recommendations"]
-        
-        # Header
-        response = f"🚀 **NeuroTrade AI - {symbol} Analysis**\n\n"
-        
-        # Current market data
-        response += f"💰 **Price**: ${price_data['price']:,.2f} USD\n"
-        response += f"📈 **24h Change**: {price_data['change_24h']:+.2f}%\n"
-        response += f"💹 **Volume**: ${price_data['volume_24h']:,.0f}\n"
-        response += f"🏆 **Market Cap**: ${price_data['market_cap']:,.0f}\n\n"
-        
-        # Technical indicators
-        response += f"🔧 **Technical Analysis**:\n"
-        response += f"• RSI: {technical['rsi']:.1f} ({'Oversold' if technical['rsi'] < 30 else 'Overbought' if technical['rsi'] > 70 else 'Neutral'})\n"
-        response += f"• SMA 20: ${technical['sma_20']:.2f}\n"
-        response += f"• SMA 50: ${technical['sma_50']:.2f}\n"
-        response += f"• Trend Strength: {technical['trend_strength']:.2f}\n"
-        response += f"• Volatility: {technical['volatility']:.3f}\n\n"
-        
-        # Market sentiment
-        response += f"🎯 **Sentiment**: {sentiment['label']} "
-        response += f"({sentiment['confidence']*100:.0f}% confidence)\n\n"
-        
-        # Trading signals
-        response += f"📊 **Trading Signals**:\n"
-        if signals["buy_signal"] > 0.3:
-            response += f"🟢 **Buy Signal**: {signals['buy_signal']*100:.0f}%\n"
-        if signals["sell_signal"] > 0.3:
-            response += f"🔴 **Sell Signal**: {signals['sell_signal']*100:.0f}%\n"
-        if signals["hold_signal"] > 0.3:
-            response += f"🟡 **Hold Signal**: {signals['hold_signal']*100:.0f}%\n"
-        response += f"• Signal Strength: {signals['strength'].title()}\n\n"
-        
-        # Risk assessment
-        response += f"⚠️ **Risk Assessment**: {risk.get('overall_risk', 'medium').title()}\n"
-        response += f"• Volatility Risk: {risk.get('volatility_risk', 'medium').title()}\n"
-        response += f"• Liquidity Risk: {risk.get('liquidity_risk', 'low').title()}\n\n"
-        
-        # Recommendations
-        if recommendations:
-            response += f"💡 **Recommendations**:\n"
-            for rec in recommendations:
-                response += f"• {rec['action']}: {rec['confidence']}% confidence\n"
-                if 'entry_price' in rec:
-                    response += f"  Entry: ${rec['entry_price']:.2f}\n"
-                if 'stop_loss' in rec:
-                    response += f"  Stop Loss: ${rec['stop_loss']:.2f}\n"
-                if 'take_profit' in rec:
-                    response += f"  Take Profit: ${rec['take_profit']:.2f}\n"
-                response += f"  Reasoning: {rec['reasoning']}\n"
-        
-        # Footer
-        response += f"\n---\n"
-        response += f"🤖 **NeuroTrade AI** - Advanced Trading Intelligence\n"
-        response += f"📊 **Live Data** • 🔍 **Technical Analysis** • 🎯 **Smart Signals**\n"
-        response += f"⚡ Generated at {datetime.now().strftime('%H:%M:%S UTC')}"
-        
-        return response
-    
-    def _format_multi_token_response(self, analyses: Dict, query_lower: str) -> str:
-        """Format response for multiple tokens"""
-        response = f"🚀 **NeuroTrade AI - Multi-Token Analysis**\n\n"
-        
-        for symbol, analysis in analyses.items():
+        """Format response for single token analysis"""
+        try:
             price_data = analysis["price_data"]
+            technical = analysis["technical_indicators"]
             sentiment = analysis["market_sentiment"]
             signals = analysis["trading_signals"]
+            risk = analysis["risk_assessment"]
             
-            response += f"**{symbol}**: ${price_data['price']:,.2f} "
-            response += f"({price_data['change_24h']:+.2f}%) "
-            response += f"- {sentiment['label']} "
+            # Price query
+            if "price" in query_lower or "what" in query_lower and f"{symbol.lower()}" in query_lower:
+                return f"""💰 **{symbol} Price Analysis**:
+• Current Price: ${price_data['price']:,.2f} USD
+• 24h Change: {price_data['change_24h']:+.2f}%
+• Volume: ${price_data['volume_24h']:,.0f}
+• Market Cap: ${price_data['market_cap']:,.0f}
+
+📊 **Technical Indicators**:
+• RSI: {technical['rsi']:.1f}
+• Trend: {technical['trend_strength']:+.2f}
+• Volatility: {technical['volatility']:.3f}"""
             
-            if signals["buy_signal"] > 0.3:
-                response += f"🟢 Buy {signals['buy_signal']*100:.0f}%"
-            elif signals["sell_signal"] > 0.3:
-                response += f"🔴 Sell {signals['sell_signal']*100:.0f}%"
+            # Market overview
+            elif "market" in query_lower or "overview" in query_lower:
+                return f"""🌍 **{symbol} Market Overview**:
+• Price: ${price_data['price']:,.2f}
+• Market Sentiment: {sentiment['label']}
+• Confidence: {sentiment['confidence']*100:.1f}%
+• 24h Performance: {price_data['change_24h']:+.2f}%
+• Trading Volume: ${price_data['volume_24h']:,.0f}
+
+📈 **Market Analysis**:
+• Trend Strength: {technical['trend_strength']:+.2f}
+• Risk Level: {risk['overall_risk'].title()}
+• Volatility: {technical['volatility']:.3f}"""
+            
+            # Trading analysis (buy/sell/trade)
+            elif any(word in query_lower for word in ["buy", "sell", "trade", "swap"]):
+                action = "BUY" if signals['buy_signal'] > signals['sell_signal'] else "SELL" if signals['sell_signal'] > signals['buy_signal'] else "HOLD"
+                confidence = signals['strength'].title()
+                
+                return f"""📊 **{symbol} Trading Analysis**:
+• Current Price: ${price_data['price']:,.2f}
+• Market Sentiment: {sentiment['label']}
+• Signal Strength: {confidence}
+
+🎯 **Recommendation**: {action}
+• Buy Signal: {signals['buy_signal']*100:.1f}%
+• Sell Signal: {signals['sell_signal']*100:.1f}%
+• Risk Level: {risk['overall_risk'].title()}
+
+⚠️ **Risk Assessment**:
+• Volatility Risk: {risk['volatility_risk'].title()}
+• Market Risk: {risk['market_risk'].title()}
+• Overall Score: {risk['score']*100:.1f}%"""
+            
+            # Default comprehensive analysis
             else:
-                response += f"🟡 Hold"
+                return f"""📈 **{symbol} Comprehensive Analysis**:
+• Price: ${price_data['price']:,.2f} ({price_data['change_24h']:+.2f}%)
+• Market Sentiment: {sentiment['label']} ({sentiment['confidence']*100:.1f}% confidence)
+• Risk Level: {risk['overall_risk'].title()}
+
+🔍 **Key Indicators**:
+• RSI: {technical['rsi']:.1f}
+• Trend Strength: {technical['trend_strength']:+.2f}
+• Volatility: {technical['volatility']:.3f}
+
+💡 **Trading Signals**:
+• Primary Signal: {"BUY" if signals['buy_signal'] > signals['sell_signal'] else "SELL"}
+• Signal Strength: {signals['strength'].title()}
+• Risk Score: {risk['score']*100:.1f}%"""
+                
+        except Exception as e:
+            logger.error(f"Error formatting single token response: {e}")
+            return f"Sorry, I encountered an error while analyzing {symbol}. Please try again."
             
-            response += f"\n"
-        
-        response += f"\n💡 **Need detailed analysis?** Ask about specific tokens!\n"
-        response += f"🤖 **NeuroTrade AI** - Your Multi-Token Trading Assistant"
-        
-        return response
+    def _format_multi_token_response(self, analyses: Dict, query_lower: str) -> str:
+        """Format response for multiple token analysis"""
+        try:
+            responses = []
+            
+            # Price comparison
+            if "price" in query_lower or "compare" in query_lower:
+                for symbol, analysis in analyses.items():
+                    price_data = analysis["price_data"]
+                    responses.append(f"""💰 **{symbol}**:
+• Price: ${price_data['price']:,.2f}
+• 24h Change: {price_data['change_24h']:+.2f}%
+• Volume: ${price_data['volume_24h']:,.0f}""")
+                    
+            # Market overview
+            elif "market" in query_lower or "overview" in query_lower:
+                for symbol, analysis in analyses.items():
+                    price_data = analysis["price_data"]
+                    sentiment = analysis["market_sentiment"]
+                    risk = analysis["risk_assessment"]
+                    responses.append(f"""🌍 **{symbol} Overview**:
+• Price: ${price_data['price']:,.2f} ({price_data['change_24h']:+.2f}%)
+• Sentiment: {sentiment['label']}
+• Risk: {risk['overall_risk'].title()}""")
+                    
+            # Trading analysis
+            elif any(word in query_lower for word in ["buy", "sell", "trade"]):
+                for symbol, analysis in analyses.items():
+                    signals = analysis["trading_signals"]
+                    risk = analysis["risk_assessment"]
+                    action = "BUY" if signals['buy_signal'] > signals['sell_signal'] else "SELL" if signals['sell_signal'] > signals['buy_signal'] else "HOLD"
+                    responses.append(f"""📊 **{symbol}**:
+• Action: {action}
+• Strength: {signals['strength'].title()}
+• Risk: {risk['overall_risk'].title()}""")
+                    
+            # Default comparison
+            else:
+                for symbol, analysis in analyses.items():
+                    price_data = analysis["price_data"]
+                    sentiment = analysis["market_sentiment"]
+                    signals = analysis["trading_signals"]
+                    responses.append(f"""📈 **{symbol}**:
+• Price: ${price_data['price']:,.2f} ({price_data['change_24h']:+.2f}%)
+• Signal: {"BUY" if signals['buy_signal'] > signals['sell_signal'] else "SELL"}
+• Sentiment: {sentiment['label']}""")
+            
+            return "\n\n".join(responses)
+            
+        except Exception as e:
+            logger.error(f"Error formatting multi-token response: {e}")
+            return "Sorry, I encountered an error while comparing the tokens. Please try again."
 
 # Global instance
 enhanced_analyzer = EnhancedTradingAnalyzer() 

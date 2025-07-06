@@ -465,6 +465,9 @@ async def chat_endpoint(request):
         symbols = data.get('symbols', [])
         user_id = data.get('user_id', 'frontend_user')
         
+        logger.info(f"📝 Received chat query: {query}")
+        logger.info(f"🏷️ Symbols provided: {symbols}")
+        
         if not query:
             return web.json_response({
                 "response": "Please provide a message",
@@ -475,18 +478,17 @@ async def chat_endpoint(request):
         # Generate response using enhanced AI if available
         if ENHANCED_AI_AVAILABLE and enhanced_analyzer:
             try:
+                logger.info("🤖 Using enhanced AI analyzer...")
                 response = await enhanced_analyzer.generate_trading_response(query, symbols)
+                logger.info(f"✅ Enhanced AI response: {response}")
             except Exception as e:
-                logger.error(f"Enhanced AI failed: {e}")
-                # Fallback to basic response
-                eth_price = await trading_data.get_eth_price()
-                market_data = {"eth_price": eth_price}
-                response = trading_data.generate_trading_recommendation(query, market_data)
+                logger.error(f"❌ Enhanced AI failed: {e}")
+                logger.info("⚠️ Falling back to basic response...")
+                response = await generate_basic_response(query, symbols)
         else:
-            # Use basic response
-            eth_price = await trading_data.get_eth_price()
-            market_data = {"eth_price": eth_price}
-            response = trading_data.generate_trading_recommendation(query, market_data)
+            logger.info("🔧 Using basic response generator...")
+            response = await generate_basic_response(query, symbols)
+            logger.info(f"✅ Basic response generated: {response}")
         
         return web.json_response({
             "response": response,
@@ -497,7 +499,7 @@ async def chat_endpoint(request):
         })
         
     except Exception as e:
-        logger.error(f"Chat endpoint error: {e}")
+        logger.error(f"❌ Chat endpoint error: {e}")
         return web.json_response({
             "response": f"Error: {str(e)}",
             "timestamp": datetime.utcnow().isoformat(),
@@ -506,6 +508,97 @@ async def chat_endpoint(request):
             "success": False,
             "error": str(e)
         }, status=500)
+
+async def generate_basic_response(query: str, symbols: List[str] = None) -> str:
+    """Generate a basic response based on the query and symbols"""
+    query_lower = query.lower()
+    logger.info(f"🔍 Generating basic response for query: {query_lower}")
+    
+    # If no symbols provided, try to detect from query
+    if not symbols:
+        symbols = []
+        for token in ["BTC", "ETH", "USDC", "USDT", "BNB"]:
+            if token.lower() in query_lower:
+                symbols.append(token)
+        # If still no symbols found, try to detect intent
+        if not symbols:
+            if "market" in query_lower or "overview" in query_lower:
+                symbols = ["ETH", "BTC"]  # Default to major coins for market overview
+            elif "price" in query_lower:
+                symbols = ["ETH"]  # Default to ETH for price queries
+    logger.info(f"🏷️ Detected/provided symbols: {symbols}")
+    
+    # Get market data for all relevant symbols
+    market_data = {}
+    for symbol in symbols:
+        try:
+            if symbol == "ETH":
+                eth_price = await trading_data.get_eth_price()
+                if eth_price:
+                    market_data["ETH"] = {
+                        "price": eth_price,
+                        "change_24h": -0.03,  # TODO: Get real data
+                        "volume": "85,330",
+                        "market_cap": "303.79B"
+                    }
+            # Add other symbol data fetching here
+            elif symbol == "BTC":
+                market_data["BTC"] = {
+                    "price": 65432.10,  # TODO: Get real data
+                    "change_24h": 2.5,
+                    "volume": "123,456",
+                    "market_cap": "1.23T"
+                }
+        except Exception as e:
+            logger.error(f"Error fetching data for {symbol}: {e}")
+            
+    # Handle different query types
+    if "price" in query_lower or "what" in query_lower and any(token.lower() in query_lower for token in ["btc", "eth", "price"]):
+        logger.info("📊 Processing price query...")
+        responses = []
+        for symbol, data in market_data.items():
+            responses.append(f"""💰 **{symbol} Analysis**:
+• Current Price: ${data['price']:,.2f} USD
+• 24h Change: {data['change_24h']}%
+• Volume: ${data['volume']}
+• Market Cap: ${data['market_cap']}""")
+        return "\n\n".join(responses) if responses else "Sorry, I couldn't fetch price data for the requested symbols."
+            
+    elif "market" in query_lower or "overview" in query_lower:
+        logger.info("📈 Processing market overview...")
+        overview = []
+        for symbol, data in market_data.items():
+            trend = "bullish" if data['change_24h'] > 0 else "bearish"
+            overview.append(f"""🌍 **{symbol} Market Overview**:
+• Price: ${data['price']:,.2f}
+• Trend: {trend.title()}
+• 24h Performance: {data['change_24h']}%
+• Trading Volume: ${data['volume']}""")
+        return "\n\n".join(overview) if overview else "Sorry, I couldn't fetch market overview data."
+            
+    elif any(word in query_lower for word in ["buy", "sell", "trade", "swap"]):
+        logger.info("💹 Processing trading analysis...")
+        analyses = []
+        for symbol, data in market_data.items():
+            sentiment = "positive" if data['change_24h'] > 0 else "negative"
+            action = "buy" if data['change_24h'] < 0 else "wait"  # Basic contrarian strategy
+            analyses.append(f"""📊 **{symbol} Trading Analysis**:
+• Current Price: ${data['price']:,.2f}
+• Market Sentiment: {sentiment}
+• Suggested Action: {action.upper()}
+• Reasoning: {"Price showing weakness, potential entry point" if action == "buy" else "Price elevated, wait for better entry"}""")
+        return "\n\n".join(analyses) if analyses else "Sorry, I couldn't generate trading analysis for the requested symbols."
+    
+    else:
+        # Generic response for other queries
+        logger.info("ℹ️ Generating generic response...")
+        return f"""I can help you with:
+• Price checks (e.g. "What's the ETH price?")
+• Market overview (e.g. "How's the market doing?")
+• Trading analysis (e.g. "Should I buy ETH?")
+• Token swaps (e.g. "Help me swap ETH to BTC")
+
+Just ask me what you'd like to know!"""
 
 async def analyze_token(request):
     """Token analysis endpoint"""
