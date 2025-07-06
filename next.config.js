@@ -2,12 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [
-      'tokens.1inch.io',
-      'tokens-data.1inch.io',
-      's2.coinmarketcap.com',
-      'cdn.1inch.io'
-    ],
+    domains: ['assets.coingecko.com'],
   },
   env: {
     MORALIS_API_KEY: process.env.MORALIS_API_KEY,

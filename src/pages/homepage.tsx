@@ -1,9 +1,10 @@
 import React from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 import Sidebar from '../components/Sidebar';
 import TypewriterInput from '../components/TypewriterInput';
 import styles from '../styles/Homepage.module.css';
-
+import logo from '../assets/images/logo.png';
 const Homepage = () => {
   return (
     <>
@@ -20,6 +21,15 @@ const Homepage = () => {
         <main className={styles.main}>
           <div className={styles.chatSection}>
             <div className={styles.chatContainer}>
+              <div className={styles.logoContainer}>
+                <Image
+                  src={logo}
+                  alt="NeuroTrade.eth Logo"
+                  width={200}
+                  height={200}
+                  priority
+                />
+              </div>
               <h1>How can I help you?</h1>
               <div className={styles.inputContainer}>
                 <TypewriterInput 
