@@ -50,6 +50,9 @@ const Sidebar = () => {
           <Link href="/" className={styles.navItem} onClick={closeMenu}>
             <span>New Chat!</span>
           </Link>
+          <Link href="http://localhost:8787/api" target="_blank" className={styles.navItem} onClick={closeMenu}>
+            <span>Swap</span>
+          </Link>
           <Link href="/belongings" className={styles.navItem} onClick={closeMenu}>
             <span>Your Belongings</span>
           </Link>

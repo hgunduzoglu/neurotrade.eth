@@ -1,72 +1,96 @@
 .container {
-  padding: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
+  display: flex;
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  color: white;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin-left: 250px;
 }
 
 .swapForm {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 2rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto;
   padding: 2rem;
-  border-radius: 12px;
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.swapForm:hover {
+  box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .inputGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .inputGroup label {
+  display: block;
+  margin-bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
-  color: #343a40;
-}
-
-.input, .select {
-  padding: 0.75rem;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
   font-size: 1rem;
-  transition: border-color 0.2s;
-  background-color: white;
 }
 
-.input:focus, .select:focus {
+.select, .input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.select:focus, .input:focus {
   outline: none;
-  border-color: #4263eb;
+  border-color: #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  transform: scale(1.02);
 }
 
-.select {
-  cursor: pointer;
-}
-
-.select:disabled {
-  background-color: #e9ecef;
+.select:disabled, .input:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
+.buttonGroup {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
 .button {
-  padding: 1rem;
-  background-color: #4263eb;
-  color: white;
+  background: linear-gradient(to right, #00ffff, #ee82ee);
   border: none;
-  border-radius: 6px;
+  padding: 1rem 2rem;
+  border-radius: 15px;
+  color: black;
+  font-weight: 600;
   font-size: 1rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 .button:hover:not(:disabled) {
-  background-color: #364fc7;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .button:disabled {
-  background-color: #adb5bd;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -95,21 +119,26 @@
 .tokenOption {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-top: 0.5rem;
 }
 
 .tokenLogo {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
 }
 
 .tokenSymbol {
-  font-weight: 500;
-  color: #343a40;
+  font-weight: 600;
+  color: white;
 }
 
 .tokenName {
-  color: #6c757d;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.9rem;
 }
 
@@ -157,13 +186,13 @@
 }
 
 .error {
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  border-radius: 8px;
-  background-color: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #dc2626;
-  font-size: 0.9rem;
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  color: #ff3b30;
+  padding: 1rem;
+  border-radius: 15px;
+  margin: 1rem 0;
+  text-align: center;
 }
 
 .routeInfo {
@@ -183,22 +212,151 @@
 }
 
 .connectionStatus {
+  text-align: center;
   margin-bottom: 1rem;
-  padding: 0.75rem;
-  border-radius: 8px;
-  background-color: #f0f9ff;
-  border: 1px solid #7dd3fc;
-  color: #0369a1;
-  font-size: 0.9rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 15px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .loading {
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  border-radius: 8px;
-  background-color: #f3f4f6;
-  border: 1px solid #d1d5db;
-  color: #374151;
-  font-size: 0.9rem;
   text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 1rem 0;
+  font-size: 1rem;
+}
+
+.orderStatus {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 15px;
+}
+
+.orderStatus h3 {
+  margin: 0 0 1rem 0;
+  color: white;
+  font-size: 1.2rem;
+  background: linear-gradient(to right, #00ffff, #A521F5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fill {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.fill p {
+  margin: 0.5rem 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin: 2rem 0;
+  background: linear-gradient(to right, #00ffff, #A521F5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Chain Selection Styles */
+.chainSelect {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.chainOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chainOption:hover {
+  background: var(--background-tertiary);
+}
+
+.chainOption.selected {
+  background: var(--accent-color);
+  color: white;
+}
+
+/* Quote Display Styles */
+.quoteDetails {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.quoteLabel {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.quoteValue {
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* Progress Indicator */
+.progressSteps {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.progressStep {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  padding-top: 20px;
+}
+
+.progressStep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--background-secondary);
+  border: 2px solid var(--border-color);
+}
+
+.progressStep.active::before {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.progressStep.completed::before {
+  background: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.progressLine {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border-color);
+  z-index: -1;
 } 
