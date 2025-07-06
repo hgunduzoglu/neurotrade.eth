@@ -1,353 +1,139 @@
-NeuroTrade.eth
+# NeuroTrade.eth
+
+NeuroTrade.eth is an advanced cross-chain decentralized AI trading platform that combines artificial intelligence, seamless onboarding, and efficient cross-chain swaps to provide a next-generation trading experience. The platform leverages cutting-edge technologies to offer intelligent trading capabilities while maintaining user privacy and security.
+
+## 🌟 Key Features
+
+### 🤖 AI-Powered Trading
+- **ASI (Artificial Superintelligence) Integration**
+  - Advanced AI agent for market analysis
+  - Real-time trading signals and recommendations
+  - Intelligent cross-chain opportunity detection
+  - Natural language interaction for trading queries
+
+### 🔄 Cross-Chain Swaps
+- **1inch Fusion+ API Integration**
+  - Optimized cross-chain token swaps
+  - Best rate discovery across chains
+  - Gas-efficient transactions
+  - Reliable execution with MEV protection
+
+### 🔑 Seamless Onboarding
+- **Privy Integration**
+  - Multi-method authentication (email, social, wallet)
+  - Embedded wallet creation and management
+  - Simplified user experience for crypto newcomers
+  - Secure key management
+
+## 🔍 User Flow
+
+### 1. Authentication & Onboarding
+- Users start at the homepage with multiple login options via Privy
+- Choose between email, social, or wallet-based authentication
+- Seamless wallet creation for new users
+- Automatic connection to supported networks
+
+### 2. Dashboard Experience
+- **Navigation**
+  - Intuitive sidebar for easy access to all features
+  - Real-time portfolio overview
+  - Transaction history and analytics
+
+### 3. Trading Interface
+- **Swap Interface**
+  - Select source and destination tokens
+  - Choose target chain for cross-chain swaps
+  - View real-time price quotes and gas estimates
+  - Execute trades with 1inch Fusion+
+
+### 4. AI Assistant Integration
+- **Interactive AI Chat**
+  - Natural language queries for market analysis
+  - Trading recommendations
+  - Portfolio insights
+  - Cross-chain opportunity detection
+
+### 5. Analytics & Monitoring
+- Track portfolio performance
+- View historical transactions
+- Monitor cross-chain positions
+- Analyze trading patterns
+
+## 🛠 Technical Stack
+
+### Frontend
+- Next.js
+- TypeScript
+- React
+- Tailwind CSS
+
+### Authentication & Wallet
+- Privy SDK for authentication
+- Wagmi for wallet interactions
+- Web3 providers
+
+### AI Integration
+- ASI.One integration
+- Custom AI agent implementation
+- Natural language processing
+
+### Cross-Chain Operations
+- 1inch Fusion+ API
+- Multi-chain support
+- Cross-chain messaging
+
+## 🚀 Getting Started
+
+1. **Clone the Repository**
+```bash
+git clone https://github.com/yourusername/neurotrade.eth.git
+cd neurotrade.eth
+```
+
+2. **Install Dependencies**
+```bash
+npm install
+```
+
+3. **Configure Environment**
+```bash
+cp .env.example .env.local
+# Edit .env.local with your API keys and configuration
+```
 
-NeuroTrade.eth is an omnichain decentralized AI trading agent that helps users trade seamlessly and intelligently across multiple blockchains. It combines AI-generated trading signals, automated trading execution, and private, confidential compute to provide the next generation of decentralized finance tools.
+4. **Run Development Server**
+```bash
+npm run dev
+```
 
-NeuroTrade supports three modes of operation:
+5. **Access the Application**
+```
+Open http://localhost:3000 in your browser
+```
 
-✅ AI Signals (Manual Execution) – AI generates trading signals, but the user decides whether to execute them.
+## 🔐 Environment Variables
 
-✅ Fully Automated AI Trading – The AI automatically executes trades based on market conditions without user intervention.
+Required environment variables:
+```
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+NEXT_PUBLIC_1INCH_API_KEY=your_1inch_api_key
+NEXT_PUBLIC_ASI_API_KEY=your_asi_api_key
+```
 
-✅ Automated User-Defined Rules – Users define specific trading rules (e.g. "Buy ETH if price drops to $2,400"), and NeuroTrade automatically executes trades when those conditions are met.
+## 📚 Documentation
 
-NeuroTrade.eth is designed to maximize eligibility for numerous hackathon bounties by integrating many state-of-the-art web3 technologies.
+- [Privy Documentation](https://docs.privy.io/)
+- [1inch Fusion+ API](https://docs.1inch.io/docs/fusion/introduction)
+- [ASI Documentation](https://docs.asi.one)
 
-Technologies & Tools Used
+## 🤝 Contributing
 
-1. Fetch.AI (uAgents, Agentverse, ASI:One)
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-Hosts the core NeuroTrade agent.
+## 📄 License
 
-Handles:
-
-receiving user prompts
-
-generating AI trading signals
-
-managing user-defined rules
-
-Deployed either locally or via Agentverse.ai.
-
-Registered as an agent discoverable on ASI:One.
-
-
-
-2. The Graph (Subgraphs & Substreams)
-
-Provides onchain data feeds for:
-
-token prices
-
-liquidity pools
-
-volume changes
-
-Enables NeuroTrade to:
-
-detect market opportunities
-
-trigger user rules
-
-generate informed AI signals.
-
-
-
-3. LayerZero
-
-Provides cross-chain messaging and bridging.
-
-Enables:
-
-moving tokens between chains
-
-executing trades across EVM networks
-
-Integrated for executing user trades on chains like Ethereum, Arbitrum, Base, and Mantle.
-
-
-
-4. Oasis ROFL (Runtime Off-chain Logic)
-
-Powers private compute for:
-
-confidential AI logic
-
-secure storage of user-defined trading rules
-
-Ensures:
-
-trading strategies remain private
-
-regulatory and user privacy compliance.
-
-
-
-5. Privy
-
-Handles:
-
-user authentication (email, social, wallet-based login)
-
-embedded wallet management
-
-Simplifies onboarding for non-crypto users.
-
-
-
-6. ENS (Ethereum Name Service)
-
-NeuroTrade is assigned the identity neurotrade.eth.
-
-Benefits:
-
-easy recognition of the AI agent
-
-can store agent metadata in text records (e.g. supported chains, trading model versions).
-
-
-
-7. Ledger / ERC-7730 Clear Signing
-
-Provides clear, human-readable transaction signing for:
-
-manual trades
-
-automatic trades if user chooses confirmation step
-
-Prevents malicious transactions by requiring explicit user approval.
-
-
-
-8. INTMAX (Optional)
-
-Provides privacy-focused payments and transfers.
-
-Users can:
-
-pay for NeuroTrade’s subscription or services anonymously
-
-execute private token transfers.
-
-
-
-How It Works
-
-User Flow
-
-Login
-
-User authenticates via Privy.
-
-NeuroTrade displays ENS identity if available (e.g. neurotrade.eth).
-
-Mode Selection
-
-User chooses:
-
-AI signals only (manual execution)
-
-fully automated AI trading
-
-automated trading via user-defined rules
-
-AI Signals
-
-NeuroTrade scans The Graph data feeds.
-
-Generates signals like:
-
-“BUY ETH on Arbitrum at $3,300. Confidence: 92%.”
-
-User can manually execute the trade.
-
-Fully Automated AI Trading
-
-NeuroTrade’s AI decides and executes trades without user intervention.
-
-Executes cross-chain transactions via LayerZero.
-
-User-Defined Rules
-
-User sets rules such as:
-
-“Buy ETH on Ethereum if price ≤ $2,400, sell if ≥ $2,600.”
-
-NeuroTrade stores rules securely in Oasis ROFL.
-
-Monitors onchain data via The Graph.
-
-Executes trades automatically when conditions are met.
-
-Cross-Chain Execution
-
-Trades are performed across chains using LayerZero.
-
-Ensures best prices and liquidity utilization.
-
-Clear Signing
-
-For any manual or auto-triggered trade, NeuroTrade optionally prompts Ledger for clear signing using ERC-7730.
-
-Private Payments (Optional)
-
-Users can pay NeuroTrade fees or subscribe privately via INTMAX.
-
-## 🤖 NeuroTrade AI Agent (Live Implementation)
-
-The NeuroTrade AI Agent is now live and ready for use! This is the core AI component that powers the trading intelligence.
-
-**📁 Agent Location**: `neurotrade_ai_agent/` folder
-
-### 🚀 Quick Start
-
-1. **Navigate to AI Agent Folder:**
-   ```bash
-   cd neurotrade_ai_agent
-   ```
-
-2. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Set Up Environment (Optional):**
-   ```bash
-   cp env_template.txt .env
-   # Edit .env with your configuration
-   ```
-
-4. **Run the Agent:**
-   ```bash
-   python neurotrade_agent.py
-   ```
-
-4. **Find it on ASI:One:**
-   - Visit https://asi1.ai
-   - Search for "NeuroTrade" or "trading"
-   - Start chatting with the AI agent!
-
-### 🎯 What the AI Agent Can Do
-
-**Price Analysis:**
-- "What's the current ETH price?"
-- "Analyze market conditions for ETH"
-
-**Trading Recommendations:**
-- "Should I buy ETH now?"
-- "Is it a good time to sell?"
-- "Give me a trading signal for USDC/ETH"
-
-**Cross-Chain Analysis:**
-- "Best chain for ETH trading?"
-- "Cross-chain opportunities available?"
-
-**Swap Analysis:**
-- "Should I swap USDC to ETH?"
-- "Compare DEX rates for my trade"
-
-### 📊 AI Agent Features
-
-- **Real-time Market Data**: Fetches live prices via The Graph Protocol
-- **Multi-Chain Support**: Ethereum, Arbitrum, Polygon, Optimism, Base
-- **Intelligent Recommendations**: AI-powered trading suggestions
-- **ASI:One Integration**: Discoverable by real users
-- **Natural Language Processing**: Understands complex trading queries
-- **Risk Assessment**: Evaluates market conditions and trading risks
-
-### 🔧 Technical Implementation
-
-The AI Agent is built with:
-- **Fetch.AI uAgents Framework**: Core agent functionality
-- **The Graph Protocol**: Real-time blockchain data
-- **Agentverse Integration**: Hosted and discoverable
-- **Python Backend**: Robust and scalable architecture
-
-See `NeuroTrade_AI_Agent_README.md` for detailed documentation.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-Features
-
-Hybrid trading system:
-
-manual AI signals
-
-fully automated AI trades
-
-user-defined trading rules
-
-Cross-chain asset management
-
-Private AI compute for sensitive trading logic
-
-User-friendly UI with embedded wallet auth
-
-ENS identity for seamless user trust
-
-Clear signing for transaction safety
-
-
-
-
-
-Setup & Running
-
-Frontend: React.js or Next.js
-
-Styling: TailwindCSS
-
-Auth & Wallet: Privy SDK
-
-Agent Logic: Fetch.AI SDK
-
-Data Feeds: The Graph (GraphQL)
-
-Cross-Chain Execution: LayerZero SDK
-
-Private Compute: Oasis ROFL SDK
-
-ENS Integration: ethers.js or ENS.js
-
-Hardware Signing: Ledger SDK
-
-Steps to Run (Example Flow)
-
-Clone repo
-
-Install dependencies
-
-Configure .env for:
-
-LayerZero endpoints
-
-Oasis API keys
-
-Privy credentials
-
-Run local server:
-
-npm run dev
-
-Deploy smart contracts on:
-
-LayerZero testnets
-
-Target chains (e.g. Arbitrum, Base)
-
-Deploy ROFL service on Oasis
-
-Future Improvements
-
-Support additional AI models for trading logic
-
-Integration with additional chains
-
-Voice or natural language input for rule creation
-
-Deeper analytics and charting tools
-
-NeuroTrade.eth represents the next leap in decentralized trading:
-
-A truly omnichain, intelligent, private trading agent — designed for both security and innovation.
-
-Let’s build the future of trading together!
+Built with ❤️ by the NeuroTrade Team
