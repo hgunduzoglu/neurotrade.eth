@@ -85,46 +85,6 @@ const Settings = () => {
         </section>
 
         <section className={styles.section}>
-          <h2>Theme</h2>
-          <div className={styles.optionsGrid}>
-            <div
-              className={`${styles.option} ${theme === 'dark' ? styles.selected : ''}`}
-              onClick={() => handleThemeChange('dark')}
-            >
-              <h3>Dark Theme</h3>
-              <p>Dark mode for comfortable night trading</p>
-            </div>
-            <div
-              className={`${styles.option} ${theme === 'light' ? styles.selected : ''}`}
-              onClick={() => handleThemeChange('light')}
-            >
-              <h3>Light Theme</h3>
-              <p>Light mode for clear visibility</p>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          <h2>Notifications</h2>
-          <div className={styles.optionsGrid}>
-            <div
-              className={`${styles.option} ${notifications ? styles.selected : ''}`}
-              onClick={() => handleNotificationsChange(true)}
-            >
-              <h3>Enable Notifications</h3>
-              <p>Receive alerts for important trading events</p>
-            </div>
-            <div
-              className={`${styles.option} ${!notifications ? styles.selected : ''}`}
-              onClick={() => handleNotificationsChange(false)}
-            >
-              <h3>Disable Notifications</h3>
-              <p>Turn off trading notifications</p>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.section}>
           <h2>Wallet Security</h2>
           <div className={styles.walletSection}>
             <div className={styles.warningBox}>
