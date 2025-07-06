@@ -5,8 +5,7 @@
 NeuroTrade.eth:
 
 - AI destekli trade önerileri sunar (Fetch.AI uAgent)
-- Hem tek zincir (tek blockchain) swap yapar → **1inch Swap API** kullanır
-- Hem cross-chain swap yapar → **LayerZero** kullanır
+- Hem tek zincir (tek blockchain) swap yapar hem crosschain swap yapar → **1inch Swap API (Fusion+) ** kullanır
 - Kullanıcıya login, wallet yönetimi, güvenli imza → **Privy** ile yapılır
 - Bazı hassas verileri gizli işler → **Oasis ROFL** kullanılır
 - ENS domaini neurotrade.eth kullanılır → kimlik sağlar
