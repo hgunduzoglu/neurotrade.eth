@@ -100,22 +100,28 @@
   transform: scale(1.02);
 }
 
-.todoNote {
-  margin-top: 2rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
-  font-size: 1.1rem;
-  text-align: center;
-  padding: 1rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  max-width: 400px;
-}
-
 .logoContainer {
   margin-bottom: 2rem;
   animation: floatAnimation 3s ease-in-out infinite;
+}
+
+/* AI Chat Container Styles */
+.aiChatContainer {
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  margin-top: 2rem;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.aiChatContainer:hover {
+  box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 @keyframes floatAnimation {

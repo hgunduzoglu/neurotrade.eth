@@ -8,9 +8,20 @@ import sys
 from typing import Dict, List, Optional
 from datetime import datetime
 from dotenv import load_dotenv
+from aiohttp import web, ClientSession
 
 from uagents import Agent, Context, Model
 from uagents.setup import fund_agent_if_low
+
+# Import the enhanced AI agent
+try:
+    from enhanced_ai_agent import enhanced_analyzer
+    ENHANCED_AI_AVAILABLE = True
+    print("✅ Enhanced AI agent loaded successfully!")
+except ImportError as e:
+    print(f"⚠️ Enhanced AI agent not available: {e}")
+    ENHANCED_AI_AVAILABLE = False
+    enhanced_analyzer = None
 
 # Load environment variables
 load_dotenv()
@@ -21,7 +32,8 @@ logger = logging.getLogger(__name__)
 
 # Agent configuration
 AGENT_SEED = os.getenv("AGENT_SEED", "neurotrade_ai_agent_seed_2024")
-AGENT_PORT = int(os.getenv("AGENT_PORT", "8001"))
+AGENT_PORT = int(os.getenv("AGENT_PORT", "8001"))  # AI agent on port 8001
+HTTP_PORT = int(os.getenv("HTTP_PORT", "8000"))  # HTTP server on port 8000
 USE_AGENTVERSE = os.getenv("USE_AGENTVERSE", "true").lower() == "true"
 
 # The Graph endpoints for different chains
@@ -248,23 +260,38 @@ async def handle_trading_query(ctx: Context, sender: str, msg: TradingQueryMessa
         
         ctx.logger.info(f"Received trading query: {query} on chain: {chain}")
         
-        # Fetch market data
-        eth_price = await trading_data.get_eth_price()
-        market_data = {
-            "eth_price": eth_price,
-            "timestamp": datetime.now().isoformat(),
-            "chain": chain
-        }
-        
-        # Generate recommendation
-        recommendation = trading_data.generate_trading_recommendation(query, market_data)
+        # Generate recommendation using enhanced AI if available
+        if ENHANCED_AI_AVAILABLE and enhanced_analyzer:
+            try:
+                ctx.logger.info("🤖 Using enhanced AI analyzer...")
+                recommendation = await enhanced_analyzer.generate_trading_response(query)
+            except Exception as e:
+                ctx.logger.error(f"Enhanced AI failed, falling back to basic: {e}")
+                # Fallback to basic recommendation
+                eth_price = await trading_data.get_eth_price()
+                market_data = {
+                    "eth_price": eth_price,
+                    "timestamp": datetime.now().isoformat(),
+                    "chain": chain
+                }
+                recommendation = trading_data.generate_trading_recommendation(query, market_data)
+        else:
+            # Use basic recommendation system
+            ctx.logger.info("🔧 Using basic recommendation system...")
+            eth_price = await trading_data.get_eth_price()
+            market_data = {
+                "eth_price": eth_price,
+                "timestamp": datetime.now().isoformat(),
+                "chain": chain
+            }
+            recommendation = trading_data.generate_trading_recommendation(query, market_data)
         
         # Create response
         response = TradingResponseMessage(
             agent="NeuroTrade AI Agent",
             query=query,
             recommendation=recommendation,
-            market_data=market_data,
+            market_data={"timestamp": datetime.now().isoformat(), "chain": chain},
             timestamp=datetime.now().isoformat(),
             chain=chain
         )
@@ -304,8 +331,19 @@ async def update_market_data(ctx: Context):
 @neurotrade_agent.on_event("startup")
 async def startup_event(ctx: Context):
     """Agent startup event"""
+    global agent_context
+    agent_context = ctx
+    
     ctx.logger.info("🚀 NeuroTrade AI Agent starting up...")
     ctx.logger.info(f"Agent address: {neurotrade_agent.address}")
+    
+    # Start HTTP server for frontend communication
+    http_runner = await start_http_server()
+    if http_runner:
+        ctx.logger.info("✅ HTTP Server started successfully!")
+        ctx.logger.info("🌐 Frontend can now connect to http://localhost:8000")
+    else:
+        ctx.logger.error("❌ HTTP Server failed to start")
     
     ctx.logger.info("📬 Mailbox enabled - agent will be discoverable on ASI:One")
     ctx.logger.info("🌐 Agent configured as 'Hosted' with 'Chat with Agent' button")
@@ -376,6 +414,188 @@ except Exception as e:
     except Exception as e2:
         print(f"❌ All chat protocols failed: {e2}")
         print("💡 Agent will run without chat capabilities")
+
+# Global variables for HTTP server
+app = web.Application()
+http_server = None
+agent_context = None
+
+# HTTP Routes for Frontend
+async def health_check(request):
+    """Health check endpoint"""
+    return web.json_response({
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "version": "1.0.0"
+    })
+
+async def handle_options(request):
+    """Handle OPTIONS requests for CORS preflight"""
+    return web.Response(
+        headers={
+            "Access-Control-Allow-Origin": "http://localhost:3000",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Max-Age": "3600",
+        }
+    )
+
+@web.middleware
+async def cors_middleware(request, handler):
+    """CORS middleware to allow frontend requests"""
+    if request.method == "OPTIONS":
+        return await handle_options(request)
+
+    try:
+        response = await handler(request)
+    except web.HTTPException as ex:
+        response = ex
+
+    # Add CORS headers to all responses
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
+
+async def chat_endpoint(request):
+    """Chat endpoint for frontend"""
+    try:
+        data = await request.json()
+        query = data.get('message', '')
+        symbols = data.get('symbols', [])
+        user_id = data.get('user_id', 'frontend_user')
+        
+        if not query:
+            return web.json_response({
+                "response": "Please provide a message",
+                "success": False,
+                "error": "Empty message"
+            }, status=400)
+        
+        # Generate response using enhanced AI if available
+        if ENHANCED_AI_AVAILABLE and enhanced_analyzer:
+            try:
+                response = await enhanced_analyzer.generate_trading_response(query, symbols)
+            except Exception as e:
+                logger.error(f"Enhanced AI failed: {e}")
+                # Fallback to basic response
+                eth_price = await trading_data.get_eth_price()
+                market_data = {"eth_price": eth_price}
+                response = trading_data.generate_trading_recommendation(query, market_data)
+        else:
+            # Use basic response
+            eth_price = await trading_data.get_eth_price()
+            market_data = {"eth_price": eth_price}
+            response = trading_data.generate_trading_recommendation(query, market_data)
+        
+        return web.json_response({
+            "response": response,
+            "timestamp": datetime.utcnow().isoformat(),
+            "symbols_analyzed": symbols,
+            "analysis_type": "trading_analysis",
+            "success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"Chat endpoint error: {e}")
+        return web.json_response({
+            "response": f"Error: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat(),
+            "symbols_analyzed": [],
+            "analysis_type": "error",
+            "success": False,
+            "error": str(e)
+        }, status=500)
+
+async def analyze_token(request):
+    """Token analysis endpoint"""
+    try:
+        symbol = request.match_info['symbol'].upper()
+        
+        if ENHANCED_AI_AVAILABLE and enhanced_analyzer:
+            try:
+                analysis = await enhanced_analyzer.analyze_token(symbol)
+                return web.json_response({
+                    "symbol": symbol,
+                    "analysis": analysis,
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "success": True
+                })
+            except Exception as e:
+                logger.error(f"Enhanced analysis failed for {symbol}: {e}")
+        
+        # Fallback to basic analysis
+        eth_price = await trading_data.get_eth_price()
+        basic_analysis = {
+            "symbol": symbol,
+            "price": eth_price if symbol == "ETH" else "N/A",
+            "recommendation": f"Basic analysis for {symbol}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        return web.json_response({
+            "symbol": symbol,
+            "analysis": basic_analysis,
+            "timestamp": datetime.utcnow().isoformat(),
+            "success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"Token analysis error: {e}")
+        return web.json_response({
+            "symbol": symbol,
+            "analysis": {},
+            "timestamp": datetime.utcnow().isoformat(),
+            "success": False,
+            "error": str(e)
+        }, status=500)
+
+async def supported_tokens(request):
+    """Supported tokens endpoint"""
+    tokens = ["BTC", "ETH", "USDC", "USDT", "BNB", "SOL", "ADA", "DOT", "MATIC", "UNI", "LINK", "AVAX", "LTC", "XRP", "DOGE"]
+    return web.json_response({
+        "tokens": tokens,
+        "count": len(tokens),
+        "timestamp": datetime.utcnow().isoformat()
+    })
+
+async def start_session(request):
+    """Start a new chat session"""
+    session_id = request.match_info.get('session_id', '')
+    try:
+        data = await request.json()
+        user_id = data.get('user_id', 'anonymous')
+        return web.json_response({
+            "status": "success",
+            "session_id": session_id,
+            "user_id": user_id,
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        return web.json_response({
+            "status": "error",
+            "error": str(e)
+        }, status=400)
+
+async def start_http_server():
+    """Start the HTTP server for frontend communication"""
+    app = web.Application(middlewares=[cors_middleware])
+    
+    # Add routes
+    app.router.add_get('/health', health_check)
+    app.router.add_post('/chat', chat_endpoint)
+    app.router.add_post('/analyze-token', analyze_token)
+    app.router.add_get('/supported-tokens', supported_tokens)
+    
+    # Add session routes
+    app.router.add_post('/session/{session_id}/start', start_session)
+    
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, 'localhost', HTTP_PORT)
+    await site.start()
+    logger.info(f"HTTP server started on http://localhost:{HTTP_PORT}")
+    return runner
 
 def signal_handler(signum, frame):
     """Handle shutdown signals gracefully"""

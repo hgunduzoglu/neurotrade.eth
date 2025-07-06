@@ -6,6 +6,9 @@ import aiohttp
 from uagents import Context, Model, Protocol
 from pydantic import Field
 
+# Import the enhanced AI agent
+from enhanced_ai_agent import enhanced_analyzer
+
 # 🎯 EXACT CHAT PROTOCOL IMPLEMENTATION
 # Based on Claude agent's manifest digest: proto:30a801ed3a83f9a0ff0a9f1e6fe958cb91da1fc2218b153df7b6cbf87bd33d62
 
@@ -70,149 +73,16 @@ exact_chat_protocol = Protocol(
 )
 
 # === TRADING LOGIC ===
-async def get_eth_trading_analysis(query: str) -> str:
-    """Get comprehensive ETH trading analysis"""
+async def get_enhanced_trading_analysis(query: str) -> str:
+    """Get comprehensive trading analysis using enhanced AI agent"""
     try:
-        # Get real-time ETH data
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                "https://api.coingecko.com/api/v3/simple/price",
-                params={
-                    "ids": "ethereum",
-                    "vs_currencies": "usd",
-                    "include_24hr_change": "true",
-                    "include_24hr_vol": "true",
-                    "include_market_cap": "true"
-                }
-            ) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    eth_data = data.get("ethereum", {})
-                    
-                    price = eth_data.get("usd", 2500)
-                    change_24h = eth_data.get("usd_24h_change", 0)
-                    volume_24h = eth_data.get("usd_24h_vol", 0)
-                    market_cap = eth_data.get("usd_market_cap", 0)
-                else:
-                    price, change_24h, volume_24h, market_cap = 2500, 0, 0, 0
-                    
+        # Use the enhanced analyzer for sophisticated analysis
+        analysis = await enhanced_analyzer.generate_trading_response(query)
+        return analysis
     except Exception as e:
-        price, change_24h, volume_24h, market_cap = 2500, 0, 0, 0
-    
-    # Generate comprehensive analysis
-    query_lower = query.lower()
-    
-    # Header with current data
-    analysis = f"🚀 **NeuroTrade AI - Live ETH Analysis**\n\n"
-    analysis += f"💰 **Current Price**: ${price:,.2f} USD\n"
-    analysis += f"📊 **24h Change**: {change_24h:+.2f}%\n"
-    analysis += f"💹 **24h Volume**: ${volume_24h:,.0f}\n"
-    analysis += f"🏆 **Market Cap**: ${market_cap:,.0f}\n\n"
-    
-    # Market sentiment
-    if change_24h > 2:
-        sentiment = "🟢 **Bullish** - Strong upward momentum"
-    elif change_24h > 0:
-        sentiment = "🟡 **Neutral-Bullish** - Positive but cautious"
-    elif change_24h > -2:
-        sentiment = "🟡 **Neutral** - Sideways movement"
-    else:
-        sentiment = "🔴 **Bearish** - Downward pressure"
-    
-    analysis += f"🎯 **Market Sentiment**: {sentiment}\n\n"
-    
-    # Specific analysis based on query
-    if any(word in query_lower for word in ["price", "cost", "value"]):
-        analysis += f"📈 **Price Analysis**:\n"
-        analysis += f"• Current trend: {'Upward' if change_24h > 0 else 'Downward' if change_24h < -1 else 'Sideways'}\n"
-        analysis += f"• Volatility: {'High' if abs(change_24h) > 3 else 'Moderate' if abs(change_24h) > 1 else 'Low'}\n"
-        analysis += f"• Volume status: {'Above average' if volume_24h > 10000000000 else 'Normal'}\n"
-        analysis += f"• Support level: ~${price * 0.95:.2f}\n"
-        analysis += f"• Resistance level: ~${price * 1.05:.2f}\n\n"
-        
-    elif any(word in query_lower for word in ["buy", "purchase", "long"]):
-        analysis += f"🔵 **Buy Signal Analysis**:\n"
-        if change_24h > 1:
-            analysis += f"✅ **Signal**: POSITIVE\n"
-            analysis += f"• Strong upward momentum detected\n"
-            analysis += f"• Volume confirms buying interest\n"
-            analysis += f"• Entry strategy: Consider immediate entry\n"
-        elif change_24h > -1:
-            analysis += f"⚠️ **Signal**: NEUTRAL\n"
-            analysis += f"• Price consolidating, wait for breakout\n"
-            analysis += f"• Entry strategy: Set buy orders at ${price * 0.98:.2f}\n"
-        else:
-            analysis += f"❌ **Signal**: NEGATIVE\n"
-            analysis += f"• Downward trend, avoid buying\n"
-            analysis += f"• Entry strategy: Wait for reversal confirmation\n"
-        analysis += f"• Stop-loss: ${price * 0.92:.2f}\n"
-        analysis += f"• Take-profit: ${price * 1.15:.2f}\n\n"
-        
-    elif any(word in query_lower for word in ["sell", "exit", "short"]):
-        analysis += f"🔴 **Sell Signal Analysis**:\n"
-        if change_24h < -1:
-            analysis += f"✅ **Signal**: POSITIVE for selling\n"
-            analysis += f"• Downward momentum confirmed\n"
-            analysis += f"• Volume suggests selling pressure\n"
-            analysis += f"• Exit strategy: Consider immediate exit\n"
-        elif change_24h < 1:
-            analysis += f"⚠️ **Signal**: NEUTRAL\n"
-            analysis += f"• Price range-bound, partial profit taking\n"
-            analysis += f"• Exit strategy: Trim positions on strength\n"
-        else:
-            analysis += f"❌ **Signal**: NEGATIVE for selling\n"
-            analysis += f"• Upward trend intact, hold positions\n"
-            analysis += f"• Exit strategy: Set trailing stops\n"
-        analysis += f"• Stop-loss: ${price * 1.08:.2f}\n"
-        analysis += f"• Target: ${price * 0.85:.2f}\n\n"
-        
-    elif any(word in query_lower for word in ["swap", "exchange", "trade"]):
-        analysis += f"🔄 **Swap Analysis**:\n"
-        analysis += f"• Current ETH price: ${price:,.2f}\n"
-        analysis += f"• Gas fees: {'High' if price > 3000 else 'Moderate' if price > 2000 else 'Low'} (network congestion)\n"
-        analysis += f"• Slippage risk: {'High' if volume_24h < 5000000000 else 'Low'}\n"
-        analysis += f"• Best timing: {'Wait for lower gas' if price > 3000 else 'Good timing'}\n"
-        analysis += f"• DEX recommendation: Use aggregators for best rates\n\n"
-        
-    elif any(word in query_lower for word in ["forecast", "prediction", "future"]):
-        analysis += f"🔮 **Market Forecast**:\n"
-        if change_24h > 2:
-            analysis += f"• Short-term (24h): Continued bullish momentum likely\n"
-            analysis += f"• Medium-term (7d): Expect some consolidation\n"
-            analysis += f"• Target: ${price * 1.10:.2f} - ${price * 1.20:.2f}\n"
-        elif change_24h < -2:
-            analysis += f"• Short-term (24h): Further downside possible\n"
-            analysis += f"• Medium-term (7d): Look for bounce signals\n"
-            analysis += f"• Target: ${price * 0.90:.2f} - ${price * 0.80:.2f}\n"
-        else:
-            analysis += f"• Short-term (24h): Range-bound trading expected\n"
-            analysis += f"• Medium-term (7d): Awaiting directional catalyst\n"
-            analysis += f"• Range: ${price * 0.95:.2f} - ${price * 1.05:.2f}\n"
-        analysis += f"\n"
-        
-    else:
-        # General analysis
-        analysis += f"💡 **General Market Status**:\n"
-        analysis += f"• ETH is showing {'strength' if change_24h > 0 else 'weakness'} today\n"
-        analysis += f"• Trading volume is {'healthy' if volume_24h > 8000000000 else 'light'}\n"
-        analysis += f"• Market structure: {'Bullish' if change_24h > 1 else 'Bearish' if change_24h < -1 else 'Neutral'}\n"
-        analysis += f"• Opportunity level: {'High' if abs(change_24h) > 3 else 'Moderate'}\n\n"
-        
-        analysis += f"🎯 **What I Can Help With**:\n"
-        analysis += f"• 'ETH price analysis' - Detailed price breakdown\n"
-        analysis += f"• 'Should I buy ETH?' - Buy signal analysis\n"
-        analysis += f"• 'Should I sell ETH?' - Sell signal analysis\n"
-        analysis += f"• 'ETH swap analysis' - Trading execution tips\n"
-        analysis += f"• 'ETH forecast' - Market predictions\n\n"
-    
-    # Footer
-    analysis += f"---\n"
-    analysis += f"🤖 **NeuroTrade AI** - Real-time Ethereum Trading Intelligence\n"
-    analysis += f"🌐 **Multi-Chain**: Ethereum • Arbitrum • Polygon • Optimism • Base\n"
-    analysis += f"⚡ **Live Data** • 🔒 **Secure** • 🎯 **Accurate**\n"
-    analysis += f"💬 **Ask me anything about ETH trading!**"
-    
-    return analysis
+        # Fallback to basic analysis if enhanced fails
+        return f"❌ **Error**: Failed to generate enhanced analysis - {str(e)}\n\n" \
+               f"💡 **Try asking about**: ETH price, buy/sell signals, or market analysis"
 
 def create_chat_response(text: str) -> ChatMessage:
     """Create a chat message response"""
@@ -302,7 +172,7 @@ async def handle_chat_message(ctx: Context, sender: str, msg: ChatMessage):
         ctx.logger.info(f"Processing query: {user_text}")
         
         # Get analysis
-        analysis = await get_eth_trading_analysis(user_text)
+        analysis = await get_enhanced_trading_analysis(user_text)
         
         # Send response
         response = create_chat_response(analysis)

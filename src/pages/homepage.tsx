@@ -2,9 +2,10 @@ import React from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import Sidebar from '../components/Sidebar';
-import TypewriterInput from '../components/TypewriterInput';
+import AIChat from '../components/AIChat';
 import styles from '../styles/Homepage.module.css';
 import logo from '../assets/images/logo.png';
+
 const Homepage = () => {
   return (
     <>
@@ -31,15 +32,7 @@ const Homepage = () => {
                 />
               </div>
               <h1>How can I help you?</h1>
-              <div className={styles.inputContainer}>
-                <TypewriterInput 
-                  text="What is the best move for this week?"
-                  className={styles.chatInput}
-                />
-              </div>
-              <div className={styles.todoNote}>
-                TODO: AI Agent Integration Coming Soon
-              </div>
+              <AIChat className={styles.aiChatContainer} />
             </div>
           </div>
         </main>
