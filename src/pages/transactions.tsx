@@ -6,182 +6,48 @@ import Sidebar from '../components/Sidebar';
 import Image from 'next/image';
 import Head from 'next/head';
 
-// Mock data
-const MOCK_TRANSACTIONS = [
-  {
-    transactionHash: '0x123...abc1',
-    transactionType: 'buy',
-    blockTimestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    exchangeName: 'Uniswap',
-    exchangeLogo: 'https://assets.coingecko.com/markets/images/535/small/UniSwap.png',
-    pairLabel: 'ETH/USDT',
-    description: 'Bought Ethereum',
-    bought: {
-      address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-      amount: '1.5',
-      usdPrice: 3500,
-      usdAmount: 5250,
-      symbol: 'ETH',
-      logo: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
-      name: 'Ethereum',
-      tokenType: 'token1'
-    },
-    sold: {
-      address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      amount: '5250',
-      usdPrice: 1,
-      usdAmount: 5250,
-      symbol: 'USDT',
-      logo: 'https://assets.coingecko.com/coins/images/325/small/Tether.png',
-      name: 'Tether USD',
-      tokenType: 'token0'
-    },
-    totalValueUsd: 5250
-  },
-  {
-    transactionHash: '0x123...abc2',
-    transactionType: 'sell',
-    blockTimestamp: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-    exchangeName: 'Uniswap',
-    exchangeLogo: 'https://assets.coingecko.com/markets/images/535/small/UniSwap.png',
-    pairLabel: 'BTC/USDT',
-    description: 'Sold Bitcoin',
-    sold: {
-      address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-      amount: '0.25',
-      usdPrice: 65000,
-      usdAmount: 16250,
-      symbol: 'BTC',
-      logo: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
-      name: 'Bitcoin',
-      tokenType: 'token0'
-    },
-    bought: {
-      address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      amount: '16250',
-      usdPrice: 1,
-      usdAmount: 16250,
-      symbol: 'USDT',
-      logo: 'https://assets.coingecko.com/coins/images/325/small/Tether.png',
-      name: 'Tether USD',
-      tokenType: 'token1'
-    },
-    totalValueUsd: 16250
-  },
-  {
-    transactionHash: '0x123...abc3',
-    transactionType: 'buy',
-    blockTimestamp: new Date(Date.now() - 14400000).toISOString(), // 4 hours ago
-    exchangeName: 'SushiSwap',
-    exchangeLogo: 'https://assets.coingecko.com/markets/images/568/small/sushiswap.png',
-    pairLabel: 'MATIC/USDT',
-    description: 'Bought Polygon',
-    bought: {
-      address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
-      amount: '1000',
-      usdPrice: 0.85,
-      usdAmount: 850,
-      symbol: 'MATIC',
-      logo: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png',
-      name: 'Polygon',
-      tokenType: 'token1'
-    },
-    sold: {
-      address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      amount: '850',
-      usdPrice: 1,
-      usdAmount: 850,
-      symbol: 'USDT',
-      logo: 'https://assets.coingecko.com/coins/images/325/small/Tether.png',
-      name: 'Tether USD',
-      tokenType: 'token0'
-    },
-    totalValueUsd: 850
-  },
-  {
-    transactionHash: '0x123...abc4',
-    transactionType: 'buy',
-    blockTimestamp: new Date(Date.now() - 86400000).toISOString(), // 24 hours ago
-    exchangeName: 'Uniswap',
-    exchangeLogo: 'https://assets.coingecko.com/markets/images/535/small/UniSwap.png',
-    pairLabel: 'SOL/USDT',
-    description: 'Bought Solana',
-    bought: {
-      address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
-      amount: '50',
-      usdPrice: 125,
-      usdAmount: 6250,
-      symbol: 'SOL',
-      logo: 'https://assets.coingecko.com/coins/images/4128/small/solana.png',
-      name: 'Solana',
-      tokenType: 'token1'
-    },
-    sold: {
-      address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      amount: '6250',
-      usdPrice: 1,
-      usdAmount: 6250,
-      symbol: 'USDT',
-      logo: 'https://assets.coingecko.com/coins/images/325/small/Tether.png',
-      name: 'Tether USD',
-      tokenType: 'token0'
-    },
-    totalValueUsd: 6250
-  },
-  {
-    transactionHash: '0x123...abc5',
-    transactionType: 'sell',
-    blockTimestamp: new Date(Date.now() - 172800000).toISOString(), // 48 hours ago
-    exchangeName: 'SushiSwap',
-    exchangeLogo: 'https://assets.coingecko.com/markets/images/568/small/sushiswap.png',
-    pairLabel: 'LINK/USDT',
-    description: 'Sold Chainlink',
-    sold: {
-      address: '0x514910771af9ca656af840dff83e8264ecf986ca',
-      amount: '100',
-      usdPrice: 18,
-      usdAmount: 1800,
-      symbol: 'LINK',
-      logo: 'https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png',
-      name: 'Chainlink',
-      tokenType: 'token0'
-    },
-    bought: {
-      address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      amount: '1800',
-      usdPrice: 1,
-      usdAmount: 1800,
-      symbol: 'USDT',
-      logo: 'https://assets.coingecko.com/coins/images/325/small/Tether.png',
-      name: 'Tether USD',
-      tokenType: 'token1'
-    },
-    totalValueUsd: 1800
-  }
-];
-
-interface TokenInfo {
-  address: string;
-  amount: string;
-  usdPrice: number;
-  usdAmount: number;
+interface ApiTransaction {
+  block_num: number;
+  datetime: string;
+  timestamp: number;
+  transaction_id: string;
+  contract: string;
+  from: string;
+  to: string;
+  decimals: number;
   symbol: string;
-  logo: string;
-  name: string;
-  tokenType: string;
+  value: number;
+}
+
+interface ApiResponse {
+  data: ApiTransaction[];
+  statistics: {
+    bytes_read: number;
+    rows_read: number;
+    elapsed: number;
+  };
+  pagination: {
+    previous_page: number;
+    current_page: number;
+    next_page: number;
+    total_pages: number;
+  };
+  results: number;
+  total_results: number;
+  request_time: string;
+  duration_ms: number;
 }
 
 interface Transaction {
   transactionHash: string;
-  transactionType: string;
-  blockTimestamp: string;
-  exchangeName: string;
-  exchangeLogo: string;
-  pairLabel: string;
-  description: string;
-  bought: TokenInfo;
-  sold: TokenInfo;
-  totalValueUsd: number;
+  blockNumber: number;
+  timestamp: number;
+  datetime: string;
+  from: string;
+  to: string;
+  symbol: string;
+  value: number;
+  decimals: number;
 }
 
 export default function Transactions() {
@@ -191,18 +57,51 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Simulate loading delay
-    const timer = setTimeout(() => {
-      setTransactions(MOCK_TRANSACTIONS);
+  const fetchTransactions = async (walletAddress: string) => {
+    try {
+      const response = await fetch(
+        `https://token-api.thegraph.com/transfers/evm?network_id=mainnet&from=${walletAddress}&orderBy=timestamp&orderDirection=desc`,
+        {
+          headers: {
+            'Authorization': 'Bearer eyJhbGciOiJLTVNFUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODc3NjExODksImp0aSI6Ijk1ZmMyMjg0LTQzNDYtNDVmOC05OTgwLTgxZWQxNWE3MmE1NCIsImlhdCI6MTc1MTc2MTE4OSwiaXNzIjoiZGZ1c2UuaW8iLCJzdWIiOiIwbWF0YWIxMTgzMmQwZDhjYmQ3NWIiLCJ2IjoxLCJha2kiOiJiY2RkYjNiYjBmNzY1Y2Q1OTdiOGFkMGZhYTZlMGZlNDMzNzY4Y2M5MjZjNDRmZjUxODY1YjFkOTg5YTgyODA1IiwidWlkIjoiMG1hdGFiMTE4MzJkMGQ4Y2JkNzViIn0.4EV1at8CDk_Dq5IDnztQblRZIE9khs7bBtzWQzD0Seqg5sfIfQH5UlN1Gn3fO30kDpeygh0hP56IbUHJZmLB_Q'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch transactions');
+      }
+
+      const data: ApiResponse = await response.json();
+      
+      const formattedTransactions: Transaction[] = data.data.map(tx => ({
+        transactionHash: tx.transaction_id,
+        blockNumber: tx.block_num,
+        timestamp: tx.timestamp,
+        datetime: tx.datetime,
+        from: tx.from,
+        to: tx.to,
+        symbol: tx.symbol,
+        value: tx.value,
+        decimals: tx.decimals
+      }));
+
+      setTransactions(formattedTransactions);
       setLoading(false);
-    }, 1000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching transactions');
+      setLoading(false);
+    }
+  };
 
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    if (authenticated && address) {
+      fetchTransactions(address);
+    }
+  }, [authenticated, address]);
 
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
+  const formatTimestamp = (timestamp: number) => {
+    const date = new Date(timestamp * 1000);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
     
@@ -214,13 +113,13 @@ export default function Transactions() {
     }
   };
 
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(Math.abs(amount));
+  const formatAmount = (value: number, decimals: number) => {
+    const formattedValue = value / Math.pow(10, decimals);
+    return formattedValue.toLocaleString(undefined, {
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 4,
+      useGrouping: true
+    });
   };
 
   const renderUnauthenticatedContent = () => (
@@ -247,7 +146,11 @@ export default function Transactions() {
         <div className={styles.error}>
           <p>Error: {error}</p>
           <button 
-            onClick={() => window.location.reload()} 
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              if (address) fetchTransactions(address);
+            }} 
             className={styles.retryButton}
           >
             Retry
@@ -262,60 +165,32 @@ export default function Transactions() {
           {transactions.map((tx) => (
             <div key={tx.transactionHash} className={styles.transactionCard}>
               <div className={styles.transactionHeader}>
-                <div className={styles.exchangeInfo}>
-                  {tx.exchangeLogo && (
-                    <Image
-                      src={tx.exchangeLogo}
-                      alt={tx.exchangeName}
-                      width={24}
-                      height={24}
-                      className={styles.exchangeLogo}
-                    />
-                  )}
-                  <span className={styles.exchangeName}>{tx.exchangeName}</span>
+                <div className={styles.transactionType}>
+                  {tx.symbol} Transfer
                 </div>
-                <span className={`${styles.transactionType} ${styles[tx.transactionType]}`}>
-                  {tx.transactionType === 'buy' ? 'Buy' : 'Sell'}
+                <span className={styles.timestamp}>
+                  {formatTimestamp(tx.timestamp)}
                 </span>
               </div>
-              <div className={styles.transactionDescription}>
-                {tx.description}
-              </div>
               <div className={styles.transactionDetails}>
-                <div className={styles.tokenExchange}>
-                  <div className={styles.tokenInfo}>
-                    <Image
-                      src={tx.sold.logo}
-                      alt={tx.sold.symbol}
-                      width={20}
-                      height={20}
-                      className={styles.tokenLogo}
-                    />
+                <div className={styles.amountDetail}>
+                  <span className={styles.label}>Amount:</span>
+                  <div className={styles.amountValue}>
                     <span className={styles.tokenAmount}>
-                      {parseFloat(tx.sold.amount).toLocaleString()} {tx.sold.symbol}
+                      {tx.value.toFixed(6)}
                     </span>
-                  </div>
-                  <div className={styles.exchangeArrow}>→</div>
-                  <div className={styles.tokenInfo}>
-                    <Image
-                      src={tx.bought.logo}
-                      alt={tx.bought.symbol}
-                      width={20}
-                      height={20}
-                      className={styles.tokenLogo}
-                    />
-                    <span className={styles.tokenAmount}>
-                      {parseFloat(tx.bought.amount).toLocaleString()} {tx.bought.symbol}
-                    </span>
+                    <span className={styles.tokenSymbol}>{tx.symbol}</span>
                   </div>
                 </div>
-                <div className={styles.detail}>
-                  <span className={styles.label}>Transaction Value:</span>
-                  <span className={styles.value}>{formatAmount(tx.totalValueUsd)}</span>
+                <div className={styles.addressDetail}>
+                  <span className={styles.label}>To:</span>
+                  <span className={styles.value} title={tx.to}>
+                    {tx.to.slice(0, 6)}...{tx.to.slice(-4)}
+                  </span>
                 </div>
                 <div className={styles.detail}>
-                  <span className={styles.label}>Time:</span>
-                  <span>{formatTimestamp(tx.blockTimestamp)}</span>
+                  <span className={styles.label}>Block:</span>
+                  <span className={styles.value}>{tx.blockNumber}</span>
                 </div>
               </div>
               <a

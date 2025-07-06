@@ -1,15 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Head from 'next/head';
 import { usePrivy } from '@privy-io/react-auth';
 import Sidebar from '../components/Sidebar';
 import styles from '../styles/Belongings.module.css';
-import {
-  TokenPrice,
-  NetworkTokenPrices,
-  fetchNetworkPrice,
-  fetchArbPrice,
-  fetchTokenPrice
-} from '../utils/priceFeeds';
+import { fetchMultipleTokenPrices } from '../utils/priceFeeds';
 
 interface TokenData {
   block_num: number;
@@ -69,155 +63,112 @@ const Belongings = () => {
   );
   const [copyStatus, setCopyStatus] = useState<CopyStatus>({});
   const [selectedChain, setSelectedChain] = useState<string | null>(null);
-  const [networkPrices, setNetworkPrices] = useState<NetworkTokenPrices>({});
-  const [tokenPrices, setTokenPrices] = useState<TokenPrice>({});
+  const [tokenPrices, setTokenPrices] = useState<{ [key: string]: any }>({});
+  const [lastFetchTime, setLastFetchTime] = useState<number>(0);
 
-  // Fetch network prices periodically
-  useEffect(() => {
-    const fetchAllNetworkPrices = async () => {
-      const supportedNetworks = ['mainnet', 'arbitrum-one', 'base', 'matic'];
+  const updateTokenPrices = useCallback(async (tokens: TokenData[]) => {
+    const now = Date.now();
+    // Only update prices if 30 seconds have passed since last update
+    if (now - lastFetchTime < 30000) return;
+
+    const uniqueSymbols = Array.from(new Set(tokens.map(token => token.symbol)));
+    const prices = await fetchMultipleTokenPrices(uniqueSymbols);
+    setTokenPrices(prices);
+    setLastFetchTime(now);
+  }, [lastFetchTime]);
+
+  const fetchTokensForChain = useCallback(async (chain: string, displayName: string) => {
+    if (!authenticated || !user?.wallet?.address) return;
+    
+    try {
+      setChainTokens(prev => prev.map(ct => 
+        ct.chain === chain ? { ...ct, loading: true, error: null } : ct
+      ));
+
+      const apiKey = process.env.NEXT_PUBLIC_GRAPH_JWT_TOKEN;
+      if (!apiKey) {
+        throw new Error('Graph API key is not configured');
+      }
       
-      for (const network of supportedNetworks) {
-        const nativePrice = await fetchNetworkPrice(network);
-        
-        if (nativePrice) {
-          if (network === 'arbitrum-one') {
-            const arbPrice = await fetchArbPrice(nativePrice);
-            setNetworkPrices(prev => ({
-              ...prev,
-              [network]: {
-                nativePrice,
-                arbPrice: arbPrice || undefined
-              }
-            }));
-          } else {
-            setNetworkPrices(prev => ({
-              ...prev,
-              [network]: {
-                nativePrice
-              }
-            }));
+      const response = await fetch(
+        `https://token-api.thegraph.com/balances/evm/${user.wallet.address}?network_id=${chain}&limit=100&page=1`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
           }
         }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(`API Error (${chain}):`, errorData);
+        throw new Error(`Failed to fetch ${displayName} token data: ${response.status}`);
       }
-    };
 
-    fetchAllNetworkPrices();
-    const interval = setInterval(fetchAllNetworkPrices, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const isTokenValid = (token: TokenData): boolean => {
-    return token.symbol.length <= 6;
-  };
-
-  useEffect(() => {
-    const fetchTokensForChain = async (chain: string, displayName: string) => {
-      if (!authenticated || !user?.wallet?.address) return;
+      const data = await response.json();
       
-      try {
-        setChainTokens(prev => prev.map(ct => 
-          ct.chain === chain ? { ...ct, loading: true, error: null } : ct
-        ));
+      // Filter out invalid tokens
+      const validTokens = (data.data || []).filter(isTokenValid);
+      
+      // Update token values with prices
+      const updatedTokens = validTokens.map((token: TokenData) => ({
+        ...token,
+        value: tokenPrices[token.symbol]?.PRICE 
+          ? parseFloat(formatTokenAmount(token.amount, token.decimals)) * tokenPrices[token.symbol].PRICE
+          : token.value
+      }));
+      
+      setChainTokens(prev => prev.map(ct => 
+        ct.chain === chain ? {
+          ...ct,
+          tokens: updatedTokens,
+          loading: false,
+          error: null
+        } : ct
+      ));
+    } catch (error) {
+      console.error(`Error fetching ${displayName} tokens:`, error);
+      setChainTokens(prev => prev.map(ct => 
+        ct.chain === chain ? {
+          ...ct,
+          tokens: [],
+          loading: false,
+          error: `Failed to fetch your ${displayName} tokens. Please try again later.`
+        } : ct
+      ));
+    }
+  }, [authenticated, user?.wallet?.address, tokenPrices]);
 
-        const apiKey = process.env.NEXT_PUBLIC_GRAPH_JWT_TOKEN;
-        if (!apiKey) {
-          throw new Error('Graph API key is not configured');
-        }
-        
-        const response = await fetch(
-          `https://token-api.thegraph.com/balances/evm/${user.wallet.address}?network_id=${chain}&limit=100&page=1`,
-          {
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': `Bearer ${apiKey}`
-            }
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error(`API Error (${chain}):`, errorData);
-          throw new Error(`Failed to fetch ${displayName} token data: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        // Filter out invalid tokens
-        const validTokens = (data.data || []).filter(isTokenValid);
-        
-        // Fetch prices for all tokens in parallel
-        const tokensWithPrices = await Promise.all(
-          validTokens.map(async (token: TokenData) => {
-            if (chain === 'mainnet' || chain === 'arbitrum-one' || chain === 'base') {
-              const networkPrice = networkPrices[chain]?.nativePrice;
-              
-              if (networkPrice) {
-                if (token.symbol.toLowerCase() === 'eth' || token.symbol.toLowerCase() === 'weth') {
-                  const amount = parseFloat(formatTokenAmount(token.amount, token.decimals));
-                  return {
-                    ...token,
-                    value: amount * parseFloat(networkPrice)
-                  };
-                } else {
-                  // Try to get cached price first
-                  let tokenPrice = tokenPrices[`${chain}-${token.contract.toLowerCase()}`];
-                  
-                  // If no cached price, fetch from API
-                  if (!tokenPrice) {
-                    const price = await fetchTokenPrice(token.contract, chain, networkPrice);
-                    if (price !== null) {
-                      setTokenPrices(prev => ({
-                        ...prev,
-                        [`${chain}-${token.contract.toLowerCase()}`]: price
-                      }));
-                      const amount = parseFloat(formatTokenAmount(token.amount, token.decimals));
-                      return {
-                        ...token,
-                        value: amount * parseFloat(price)
-                      };
-                    }
-                  } else {
-                    const amount = parseFloat(formatTokenAmount(token.amount, token.decimals));
-                    return {
-                      ...token,
-                      value: amount * parseFloat(tokenPrice)
-                    };
-                  }
-                }
-              }
-            }
-            return token;
-          })
-        );
-        
-        setChainTokens(prev => prev.map(ct => 
-          ct.chain === chain ? {
-            ...ct,
-            tokens: tokensWithPrices,
-            loading: false,
-            error: null
-          } : ct
-        ));
-      } catch (error) {
-        console.error(`Error fetching ${displayName} tokens:`, error);
-        setChainTokens(prev => prev.map(ct => 
-          ct.chain === chain ? {
-            ...ct,
-            tokens: [],
-            loading: false,
-            error: `Failed to fetch your ${displayName} tokens. Please try again later.`
-          } : ct
-        ));
-      }
-    };
-
+  // Initial data fetch
+  useEffect(() => {
     if (authenticated && user?.wallet?.address) {
       SUPPORTED_CHAINS.forEach(chain => {
         fetchTokensForChain(chain.id, chain.name);
       });
     }
-  }, [authenticated, user?.wallet?.address, networkPrices, tokenPrices]);
+  }, [authenticated, user?.wallet?.address, fetchTokensForChain]);
+
+  // Update prices periodically
+  useEffect(() => {
+    const updatePrices = async () => {
+      const allTokens = chainTokens.flatMap(chain => chain.tokens);
+      if (allTokens.length > 0) {
+        await updateTokenPrices(allTokens);
+      }
+    };
+
+    // Initial price update
+    updatePrices();
+
+    // Set up interval for price updates
+    const interval = setInterval(updatePrices, 30000);
+    return () => clearInterval(interval);
+  }, [chainTokens, updateTokenPrices]);
+
+  const isTokenValid = (token: TokenData): boolean => {
+    return token.symbol.length <= 6;
+  };
 
   const formatUsdValue = (value?: number) => {
     if (!value) return '-';
@@ -265,68 +216,41 @@ const Belongings = () => {
     }
   };
 
-  const renderTokenCard = (token: TokenData) => {
-    const networkPrice = networkPrices[token.network_id]?.nativePrice;
-    const arbPrice = networkPrices[token.network_id]?.arbPrice;
-    const tokenPrice = tokenPrices[`${token.network_id}-${token.contract.toLowerCase()}`];
-    const maticPrice = networkPrices[token.network_id]?.nativePrice;
-    // Calculate unit price
-    const amount = parseFloat(formatTokenAmount(token.amount, token.decimals));
-    const unitPrice = token.value && amount ? (token.value / amount).toFixed(2) : null;
-
-    return (
-      <div 
-        key={token.contract} 
-        className={styles.tokenCard}
-        onClick={() => copyToClipboard(token.contract)}
-      >
-        <div className={styles.tokenHeader}>
-          <div className={styles.tokenSymbol}>
-            <img 
-              src={CHAIN_LOGOS[token.network_id as keyof typeof CHAIN_LOGOS]} 
-              alt={token.symbol}
-              width={24}
-              height={24}
-              className={styles.tokenLogo}
-            />
-            <span className={styles.symbolText}>{token.symbol}</span>
-          </div>
-          <div className={styles.tokenValue}>
-            ${unitPrice || '0.00'}
-          </div>
+  const renderTokenCard = (token: TokenData) => (
+    <div 
+      key={token.contract} 
+      className={styles.tokenCard}
+      onClick={() => copyToClipboard(token.contract)}
+    >
+      <div className={styles.tokenHeader}>
+        <div className={styles.tokenSymbol}>
+          <img 
+            src={CHAIN_LOGOS[token.network_id as keyof typeof CHAIN_LOGOS]} 
+            alt={token.symbol}
+            width={24}
+            height={24}
+            className={styles.tokenLogo}
+          />
+          <span className={styles.symbolText}>{token.symbol}</span>
         </div>
-        <div className={styles.tokenDetails}>
-          <div className={styles.tokenBalance}>
-            {formatTokenAmount(token.amount, token.decimals)} {token.symbol}
-          </div>
-          <div className={styles.priceInfo}>
-            {networkPrice && (
-              <div className={styles.nativePrice}>
-                1 ETH = ${parseFloat(networkPrice).toFixed(2)}
-              </div>
-            )}
-            {token.network_id === 'arbitrum-one' && arbPrice && (
-              <div className={styles.nativePrice}>
-                1 ARB = ${parseFloat(arbPrice).toFixed(2)}
-              </div>
-            )}
-            {token.network_id === 'matic' && maticPrice && (
-              <div className={styles.nativePrice}>
-                1 MATIC = ${parseFloat(maticPrice).toFixed(2)}
-              </div>
-            )}
-          </div>
-          <div className={styles.contractAddress}>
-            {copyStatus[token.contract] ? (
-              <span className={styles.copiedText}>Copied!</span>
-            ) : (
-              <span className={styles.addressText}>{maskAddress(token.contract)}</span>
-            )}
-          </div>
+        <div className={styles.tokenValue}>
+          {formatUsdValue(token.value)}
         </div>
       </div>
-    );
-  };
+      <div className={styles.tokenDetails}>
+        <div className={styles.tokenBalance}>
+          {formatTokenAmount(token.amount, token.decimals)} {token.symbol}
+        </div>
+        <div className={styles.contractAddress}>
+          {copyStatus[token.contract] ? (
+            <span className={styles.copiedText}>Copied!</span>
+          ) : (
+            <span className={styles.addressText}>{maskAddress(token.contract)}</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   const renderChainSelector = () => (
     <div className={styles.chainSelector}>

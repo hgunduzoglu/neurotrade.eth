@@ -209,41 +209,12 @@
 .tokenDetails {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 0.5rem;
 }
 
 .tokenBalance {
+  color: #ccc;
   font-size: 0.9rem;
-  color: #666;
-}
-
-.priceInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.85rem;
-  color: #666;
-  background-color: rgba(0, 0, 0, 0.03);
-  padding: 8px;
-  border-radius: 6px;
-  margin: 4px 0;
-}
-
-.unitPrice, .nativePrice {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.unitPrice {
-  color: #2563eb;
-  font-weight: 500;
-}
-
-.nativePrice {
-  color: #059669;
-  font-size: 0.8rem;
 }
 
 .contractAddress {

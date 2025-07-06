@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import styles from '../styles/Analytics.module.css';
 import Sidebar from '../components/Sidebar';
+import { fetchMultipleTokenPrices } from '../utils/priceFeeds';
 
 ChartJS.register(
   ArcElement,
@@ -102,6 +103,7 @@ const Analytics = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tokenPrices, setTokenPrices] = useState<{ [key: string]: any }>({});
 
   const formatUsdValue = (value?: number) => {
     if (!value) return '-';
@@ -124,12 +126,18 @@ const Analytics = () => {
     }
   };
 
+  const updateTokenPrices = async (tokens: TokenData[]) => {
+    const uniqueSymbols = Array.from(new Set(tokens.map(token => token.symbol)));
+    const prices = await fetchMultipleTokenPrices(uniqueSymbols);
+    setTokenPrices(prices);
+  };
+
   const updateChartData = useCallback((tokens: ChainTokens[]) => {
     // Token Distribution Chart
     const tokenValues: { [key: string]: number } = {};
     const tokenColors: { [key: string]: string } = {};
 
-    tokens.forEach(chain => {
+    tokens.forEach((chain: ChainTokens) => {
       chain.tokens.forEach(token => {
         if (token.value && token.value > 0) {
           const key = `${token.symbol} (${formatTokenAmount(token.amount, token.decimals)})`;
@@ -212,10 +220,18 @@ const Analytics = () => {
             // Filter out invalid tokens
             const validTokens = (data.data || []).filter(isTokenValid);
             
+            // Update token values with prices
+            const updatedTokens = validTokens.map((token: TokenData) => ({
+              ...token,
+              value: tokenPrices[token.symbol]?.PRICE 
+                ? parseFloat(formatTokenAmount(token.amount, token.decimals)) * tokenPrices[token.symbol].PRICE
+                : token.value
+            }));
+            
             return {
               chain: chain.id,
               displayName: chain.name,
-              tokens: validTokens,
+              tokens: updatedTokens,
               loading: false,
               error: null
             };
@@ -237,7 +253,7 @@ const Analytics = () => {
       console.error('Error fetching chain data:', error);
       throw error;
     }
-  }, []);
+  }, [tokenPrices]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -257,6 +273,10 @@ const Analytics = () => {
             setChainTokens(data);
             updateChartData(data);
             setIsLoading(false);
+            
+            // Still update prices for cached data
+            const allTokens = data.flatMap((chain: ChainTokens) => chain.tokens);
+            await updateTokenPrices(allTokens);
             return;
           }
           localStorage.removeItem(`analytics_${address}`);
@@ -290,6 +310,22 @@ const Analytics = () => {
 
     loadData();
   }, [authenticated, user?.wallet?.address, updateChartData, fetchAllChainData]);
+
+  // Update prices periodically
+  useEffect(() => {
+    const updateAllPrices = async () => {
+      const allTokens = chainTokens.flatMap(chain => chain.tokens);
+      await updateTokenPrices(allTokens);
+    };
+
+    // Initial update
+    updateAllPrices();
+
+    // Set up interval for updates
+    const interval = setInterval(updateAllPrices, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [chainTokens]);
 
   const calculatePortfolioTotal = () => {
     return chainTokens.reduce((total, chain) => 
