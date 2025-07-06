@@ -135,6 +135,17 @@ const Belongings = () => {
     return chainTokens.reduce((total, chain) => total + calculateTotalValue(chain.tokens), 0);
   };
 
+  const formatTokenAmount = (amount: string, decimals: number) => {
+    try {
+      const value = parseFloat(amount);
+      if (isNaN(value)) return '0';
+      return (value / Math.pow(10, decimals)).toFixed(6);
+    } catch (error) {
+      console.error('Error formatting token amount:', error);
+      return '0';
+    }
+  };
+
   const renderTokenList = (chainData: ChainTokens) => {
     if (chainData.loading) {
       return <div className={styles.loading}>Loading {chainData.displayName} tokens...</div>;
@@ -183,7 +194,7 @@ const Belongings = () => {
                 {token.symbol}
               </div>
               <div className={styles.tokenBalance}>
-                {Number(token.amount).toFixed(4)} {token.symbol}
+                {formatTokenAmount(token.amount, token.decimals)} {token.symbol}
               </div>
               <div className={styles.tokenInfo}>
                 <div className={styles.tokenPrice}>

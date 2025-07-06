@@ -103,6 +103,27 @@ const Analytics = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const formatUsdValue = (value?: number) => {
+    if (!value) return '-';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  };
+
+  const formatTokenAmount = (amount: string, decimals: number) => {
+    try {
+      const value = parseFloat(amount);
+      if (isNaN(value)) return '0';
+      return (value / Math.pow(10, decimals)).toFixed(6);
+    } catch (error) {
+      console.error('Error formatting token amount:', error);
+      return '0';
+    }
+  };
+
   const updateChartData = useCallback((tokens: ChainTokens[]) => {
     // Token Distribution Chart
     const tokenValues: { [key: string]: number } = {};
@@ -111,7 +132,7 @@ const Analytics = () => {
     tokens.forEach(chain => {
       chain.tokens.forEach(token => {
         if (token.value && token.value > 0) {
-          const key = token.symbol;
+          const key = `${token.symbol} (${formatTokenAmount(token.amount, token.decimals)})`;
           tokenValues[key] = (tokenValues[key] || 0) + token.value;
           if (!tokenColors[key]) {
             tokenColors[key] = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
@@ -261,16 +282,6 @@ const Analytics = () => {
 
     loadData();
   }, [authenticated, user?.wallet?.address, updateChartData, fetchAllChainData]);
-
-  const formatUsdValue = (value?: number) => {
-    if (!value) return '-';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value);
-  };
 
   const calculatePortfolioTotal = () => {
     return chainTokens.reduce((total, chain) => 
