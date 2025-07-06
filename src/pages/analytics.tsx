@@ -177,6 +177,10 @@ const Analytics = () => {
     });
   }, []);
 
+  const isTokenValid = (token: TokenData): boolean => {
+    return token.symbol.length <= 6;
+  };
+
   const fetchAllChainData = useCallback(async (address: string) => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_GRAPH_API_KEY;
@@ -204,10 +208,14 @@ const Analytics = () => {
             }
 
             const data = await response.json();
+            
+            // Filter out invalid tokens
+            const validTokens = (data.data || []).filter(isTokenValid);
+            
             return {
               chain: chain.id,
               displayName: chain.name,
-              tokens: data.data || [],
+              tokens: validTokens,
               loading: false,
               error: null
             };

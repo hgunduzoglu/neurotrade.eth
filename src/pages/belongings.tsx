@@ -57,6 +57,10 @@ const Belongings = () => {
     }))
   );
 
+  const isTokenValid = (token: TokenData): boolean => {
+    return token.symbol.length <= 6;
+  };
+
   useEffect(() => {
     const fetchTokensForChain = async (chain: string, displayName: string) => {
       if (!authenticated || !user?.wallet?.address) return;
@@ -89,10 +93,13 @@ const Belongings = () => {
 
         const data = await response.json();
         
+        // Filter out invalid tokens
+        const validTokens = (data.data || []).filter(isTokenValid);
+        
         setChainTokens(prev => prev.map(ct => 
           ct.chain === chain ? {
             ...ct,
-            tokens: data.data || [],
+            tokens: validTokens,
             loading: false,
             error: null
           } : ct
