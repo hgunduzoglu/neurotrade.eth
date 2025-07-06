@@ -183,7 +183,7 @@ const Analytics = () => {
 
   const fetchAllChainData = useCallback(async (address: string) => {
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GRAPH_API_KEY;
+      const apiKey = process.env.NEXT_PUBLIC_GRAPH_JWT_TOKEN;
       if (!apiKey) {
         throw new Error('Graph API key is not configured');
       }

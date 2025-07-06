@@ -10,6 +10,7 @@
   left: 0;
   bottom: 0;
   z-index: 20;
+  transition: transform 0.3s ease;
 }
 
 .logo {
@@ -119,4 +120,34 @@
 
 .logoutButton:hover {
   background: rgba(255, 0, 0, 0.2);
+}
+
+/* Mobile Menu Button */
+.menuButton {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 30;
+  background: rgba(26, 26, 26, 0.9);
+  border: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .menuButton {
+    display: block;
+  }
 } 
