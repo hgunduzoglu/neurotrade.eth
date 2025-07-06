@@ -33,7 +33,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.portfolioHeader h1 {
+.title {
   font-size: 2.5rem;
   background: linear-gradient(to right, #00ffff, #ee82ee);
   -webkit-background-clip: text;
@@ -47,13 +47,14 @@
   font-weight: bold;
 }
 
-.chainContainer {
-  display: flex;
-  flex-direction: column;
+.chartsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
+  margin-top: 2rem;
 }
 
-.chainSection {
+.chartBox {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 16px;
   padding: 1.5rem;
@@ -61,41 +62,44 @@
   transition: all 0.3s ease;
 }
 
-.chainSection:hover {
+.chartBox:hover {
   border-color: rgba(0, 255, 255, 0.2);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
 }
 
-.chainHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.chartBox h2 {
+  text-align: center;
   margin-bottom: 1.5rem;
-}
-
-.chainInfo {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.chainLogo {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 4px;
-}
-
-.chainTitle {
   font-size: 1.5rem;
   color: #00ffff;
-  margin: 0;
 }
 
-.chainTotal {
-  font-size: 1.1rem;
+.chart {
+  max-width: 400px;
+  margin: 0 auto;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.7);
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+.error {
+  border-color: rgba(255, 0, 0, 0.2);
+  color: rgba(255, 100, 100, 0.8);
 }
 
 .unauthenticatedContainer {
@@ -148,72 +152,4 @@
 .connectButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-}
-
-.loading, .error, .noTokens {
-  text-align: center;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.error {
-  border-color: rgba(255, 0, 0, 0.2);
-  color: rgba(255, 100, 100, 0.8);
-}
-
-.tokenList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  width: 100%;
-}
-
-.tokenItem {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.tokenItem:hover {
-  transform: translateY(-2px);
-  border-color: #00ffff;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-}
-
-.tokenSymbol {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-}
-
-.tokenBalance {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.tokenInfo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.tokenPrice {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.tokenValue {
-  font-size: 0.875rem;
-  color: #00ffff;
 } 

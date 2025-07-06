@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  margin-left: 250px;
 }
 
 .header {
@@ -57,39 +58,74 @@
   width: 100%;
   max-width: 800px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
 }
 
 .chatContainer h1 {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  background: linear-gradient(to right, #00ffff, #ee82ee);
+  font-size: 3rem;
+  background: linear-gradient(to right, #00ffff, #A521F5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  margin: 0;
 }
 
 .inputContainer {
-  margin-top: 2rem;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .chatInput {
   width: 100%;
-  padding: 15px 20px;
+  padding: 20px 30px;
   border-radius: 25px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
   color: white;
-  font-size: 16px;
+  font-size: 18px;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .chatInput:focus {
   outline: none;
   border-color: #00ffff;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  transform: scale(1.02);
 }
 
 .todoNote {
   margin-top: 2rem;
   color: rgba(255, 255, 255, 0.5);
   font-style: italic;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 400px;
+}
+
+.logoContainer {
+  margin-bottom: 2rem;
+  animation: floatAnimation 3s ease-in-out infinite;
+}
+
+@keyframes floatAnimation {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 } 
