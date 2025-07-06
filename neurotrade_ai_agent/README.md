@@ -34,7 +34,7 @@ python neurotrade_agent.py
 
 Required environment variables:
 - `AGENT_SEED` - Unique agent identifier
-- `AGENT_PORT` - Agent port (default: 8001)
+- `AGENT_PORT` - Agent port (default: 8000)
 - `LOG_LEVEL` - Logging level (default: INFO)
 
 ## 🌐 Deployment

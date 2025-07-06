@@ -86,9 +86,16 @@ const Sidebar = () => {
             <FiMessageSquare size={20} />
             {!isCollapsed && <span>New Chat!</span>}
           </Link>
+
+          <Link href="http://localhost:8787/api" target="_blank" className={styles.navItem} onClick={closeMenu}>
+            <span>Swap</span>
+          </Link>
+          <Link href="/belongings" className={styles.navItem} onClick={closeMenu}>
+            <span>Your Belongings</span
           <Link href="/belongings" className={styles.navItem} onClick={closeMenu} title="Your Belongings">
             <FiBox size={20} />
             {!isCollapsed && <span>Your Belongings</span>}
+
           </Link>
           <Link href="/analytics" className={styles.navItem} onClick={closeMenu} title="Analytics">
             <FiBarChart size={20} />

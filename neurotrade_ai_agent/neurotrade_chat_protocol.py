@@ -5,6 +5,9 @@ import aiohttp
 
 from uagents import Context, Model, Protocol
 
+# Import the enhanced AI agent
+from enhanced_ai_agent import enhanced_analyzer
+
 # 🎯 NEUROTRADE CUSTOM CHAT PROTOCOL
 # Completely custom implementation - no official spec dependency
 
@@ -45,108 +48,16 @@ neurotrade_chat_protocol = Protocol(
 # Active sessions tracking
 active_sessions = {}
 
-async def get_eth_trading_data(query: str) -> dict:
-    """Get real-time ETH trading data"""
+async def get_enhanced_neurotrade_analysis(query: str) -> str:
+    """Generate enhanced trading analysis using the AI agent"""
     try:
-        # Fetch ETH price from CoinGecko
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                "https://api.coingecko.com/api/v3/simple/price",
-                params={
-                    "ids": "ethereum",
-                    "vs_currencies": "usd",
-                    "include_24hr_change": "true",
-                    "include_24hr_vol": "true"
-                }
-            ) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    eth_data = data.get("ethereum", {})
-                    return {
-                        "price": eth_data.get("usd", 2500),
-                        "change_24h": eth_data.get("usd_24h_change", 0),
-                        "volume_24h": eth_data.get("usd_24h_vol", 0)
-                    }
-                else:
-                    return {"price": 2500, "change_24h": 0, "volume_24h": 0}
+        # Use the enhanced analyzer for sophisticated analysis
+        analysis = await enhanced_analyzer.generate_trading_response(query)
+        return analysis
     except Exception as e:
-        print(f"Error fetching ETH data: {e}")
-        return {"price": 2500, "change_24h": 0, "volume_24h": 0}
-
-def generate_trading_response(query: str, trading_data: dict) -> str:
-    """Generate trading response based on query and data"""
-    query_lower = query.lower()
-    price = trading_data.get("price", 2500)
-    change_24h = trading_data.get("change_24h", 0)
-    volume_24h = trading_data.get("volume_24h", 0)
-    
-    response = f"🚀 **NeuroTrade AI Analysis**\n\n"
-    response += f"💰 **Current ETH Price**: ${price:,.2f} USD\n"
-    response += f"📈 **24h Change**: {change_24h:+.2f}%\n"
-    response += f"💹 **24h Volume**: ${volume_24h:,.0f} USD\n\n"
-    
-    # Market sentiment
-    sentiment = "🟢 Bullish" if change_24h > 0 else "🔴 Bearish" if change_24h < -2 else "🟡 Neutral"
-    response += f"🎯 **Market Sentiment**: {sentiment}\n\n"
-    
-    if "price" in query_lower:
-        response += f"📊 **Price Analysis**:\n"
-        response += f"• ETH is {'up' if change_24h > 0 else 'down'} {abs(change_24h):.2f}% in 24h\n"
-        response += f"• Current trend: {'Bullish momentum' if change_24h > 2 else 'Bearish pressure' if change_24h < -2 else 'Sideways movement'}\n"
-        response += f"• Volume: {'High' if volume_24h > 10000000000 else 'Normal'} trading activity\n\n"
-        
-    elif "buy" in query_lower:
-        response += f"🔵 **Buy Signal Analysis**:\n"
-        if change_24h > 0:
-            response += f"• ✅ Positive momentum detected\n"
-            response += f"• 💡 Consider dollar-cost averaging\n"
-            response += f"• ⚡ Entry point: Current levels look favorable\n"
-        else:
-            response += f"• ⚠️ Price showing weakness\n"
-            response += f"• 💡 Wait for confirmation or lower entry\n"
-            response += f"• 📉 Consider setting buy orders below current price\n"
-        response += f"• 🎯 **Risk**: Moderate | **Timeframe**: Medium-term\n\n"
-        
-    elif "sell" in query_lower:
-        response += f"🔴 **Sell Signal Analysis**:\n"
-        if change_24h < -2:
-            response += f"• ⚠️ Significant downward pressure\n"
-            response += f"• 💡 Consider taking profits if in green\n"
-            response += f"• 📉 Stop-loss recommended\n"
-        else:
-            response += f"• ✅ Price holding well\n"
-            response += f"• 💰 Consider partial profit-taking\n"
-            response += f"• 🎯 Set trailing stops\n"
-        response += f"• 🎯 **Risk**: Moderate | **Strategy**: Profit protection\n\n"
-        
-    elif "swap" in query_lower:
-        response += f"🔄 **Swap Analysis**:\n"
-        response += f"• 💱 Current ETH price: ${price:,.2f}\n"
-        response += f"• ⛽ Gas fees: Check current network congestion\n"
-        response += f"• 🌊 Liquidity: {'Good' if volume_24h > 5000000000 else 'Check DEX pools'}\n"
-        response += f"• ⏰ Timing: {'Favorable' if abs(change_24h) < 3 else 'Volatile - use limit orders'}\n\n"
-        
-    elif "analysis" in query_lower or "market" in query_lower:
-        response += f"📈 **Market Analysis**:\n"
-        response += f"• 📊 Technical: {sentiment.split()[1]} bias\n"
-        response += f"• 💹 Volume: {'Above' if volume_24h > 8000000000 else 'Below'} average\n"
-        response += f"• 🎯 Support/Resistance: Monitor key levels\n"
-        response += f"• 🔮 Outlook: {'Positive' if change_24h > 1 else 'Cautious' if change_24h > -1 else 'Bearish'}\n\n"
-        
-    else:
-        response += f"💡 **Available Commands**:\n"
-        response += f"• 'ETH price' - Current price and trends\n"
-        response += f"• 'Should I buy ETH?' - Buy signal analysis\n"
-        response += f"• 'Should I sell ETH?' - Sell signal analysis\n"
-        response += f"• 'ETH swap analysis' - Swap recommendations\n"
-        response += f"• 'Market analysis' - Complete market overview\n\n"
-    
-    response += f"---\n"
-    response += f"🤖 **NeuroTrade AI** - Your Smart Trading Assistant\n"
-    response += f"🌐 **Multi-chain Support**: Ethereum, Arbitrum, Polygon, Optimism, Base\n"
-    response += f"⚡ **Real-time Data** | 🔒 **Secure** | 🎯 **Accurate**"
-    
-    return response
+        # Fallback to basic error message
+        return f"❌ **Error**: Failed to generate enhanced analysis - {str(e)}\n\n" \
+               f"💡 **Try asking about**: ETH price, buy/sell signals, or market analysis"
 
 @neurotrade_chat_protocol.on_message(NeurotradeChatMessage)
 async def handle_neurotrade_chat(ctx: Context, sender: str, msg: NeurotradeChatMessage):
@@ -181,18 +92,15 @@ async def handle_neurotrade_chat(ctx: Context, sender: str, msg: NeurotradeChatM
             # Process trading query
             ctx.logger.info(f"Processing query: {content}")
             
-            # Get real-time trading data
-            trading_data = await get_eth_trading_data(content)
-            
-            # Generate response
-            response_content = generate_trading_response(content, trading_data)
+            # Get enhanced trading analysis
+            response_content = await get_enhanced_neurotrade_analysis(content)
             
             # Send response
             response = NeurotradeChatResponse(
                 msg_id=str(uuid4()),
                 content=response_content,
                 timestamp=datetime.utcnow().isoformat(),
-                trading_data=trading_data,
+                trading_data=None,  # Enhanced analysis includes all data internally
                 msg_type="response"
             )
             
