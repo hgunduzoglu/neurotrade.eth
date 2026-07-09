@@ -47,7 +47,7 @@ Next.js Application
   `-- Cross-chain swap -------------> Server-side API proxy
                                        |
                                        `--> 1inch Fusion+
-````
+```
 
 ### Analysis Flow
 
@@ -258,5 +258,4 @@ npm run dev
 
 neurotrade.eth is an experimental hackathon project. Its market signals are informational and should not be interpreted as financial advice. Do not use the prototype with funds you cannot afford to lose.
 
-```
 
