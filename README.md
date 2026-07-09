@@ -1,139 +1,262 @@
-# NeuroTrade.eth
+# neurotrade.eth
 
-NeuroTrade.eth is an advanced cross-chain decentralized AI trading platform that combines artificial intelligence, seamless onboarding, and efficient cross-chain swaps to provide a next-generation trading experience. The platform leverages cutting-edge technologies to offer intelligent trading capabilities while maintaining user privacy and security.
+AI-assisted cross-chain trading interface that combines conversational market analysis with explicit, user-signed execution through 1inch Fusion+.
 
-## 🌟 Key Features
+**1inch Partner Prize · ETHGlobal Cannes 2025**
 
-### 🤖 AI-Powered Trading
-- **ASI (Artificial Superintelligence) Integration**
-  - Advanced AI agent for market analysis
-  - Real-time trading signals and recommendations
-  - Intelligent cross-chain opportunity detection
-  - Natural language interaction for trading queries
+> The assistant analyzes and recommends. The user chooses the trade and signs the order.
 
-### 🔄 Cross-Chain Swaps
-- **1inch Fusion+ API Integration**
-  - Optimized cross-chain token swaps
-  - Best rate discovery across chains
-  - Gas-efficient transactions
-  - Reliable execution with MEV protection
+## Overview
 
-### 🔑 Seamless Onboarding
-- **Privy Integration**
-  - Multi-method authentication (email, social, wallet)
-  - Embedded wallet creation and management
-  - Simplified user experience for crypto newcomers
-  - Secure key management
+neurotrade.eth was built to make token research and cross-chain execution part of one coherent flow.
 
-## 🔍 User Flow
+Users can ask the assistant about supported assets, review technical signals and risk indicators, inspect their portfolio, and continue into a cross-chain swap without leaving the application.
 
-### 1. Authentication & Onboarding
-- Users start at the homepage with multiple login options via Privy
-- Choose between email, social, or wallet-based authentication
-- Seamless wallet creation for new users
-- Automatic connection to supported networks
+Analysis and execution are deliberately separated. The assistant cannot move funds or execute trades autonomously. Every swap is configured and signed explicitly by the user.
 
-### 2. Dashboard Experience
-- **Navigation**
-  - Intuitive sidebar for easy access to all features
-  - Real-time portfolio overview
-  - Transaction history and analytics
+The project was built by a team of two for ETHGlobal Cannes 2025 and received a 1inch partner prize.
 
-### 3. Trading Interface
-- **Swap Interface**
-  - Select source and destination tokens
-  - Choose target chain for cross-chain swaps
-  - View real-time price quotes and gas estimates
-  - Execute trades with 1inch Fusion+
+## Core Features
 
-### 4. AI Assistant Integration
-- **Interactive AI Chat**
-  - Natural language queries for market analysis
-  - Trading recommendations
-  - Portfolio insights
-  - Cross-chain opportunity detection
+- Conversational token and market analysis
+- Buy, sell, and hold signals with risk context
+- Cross-chain swaps through 1inch Fusion+
+- Privy email and wallet authentication
+- Embedded wallets for users without an existing wallet
+- External wallet support through wagmi
+- Multi-chain portfolio and transaction views
+- Server-side proxying for protected API credentials
+- Explicit user approval and signing before execution
 
-### 5. Analytics & Monitoring
-- Track portfolio performance
-- View historical transactions
-- Monitor cross-chain positions
-- Analyze trading patterns
+## How It Works
 
-## 🛠 Technical Stack
+```text
+User
+  |
+  v
+Next.js Application
+  |
+  |-- Chat and token analysis ------> FastAPI AI service
+  |                                    |
+  |                                    `--> Market data and indicators
+  |
+  |-- Portfolio data ---------------> The Graph
+  |
+  |-- Wallet onboarding ------------> Privy + wagmi
+  |
+  `-- Cross-chain swap -------------> Server-side API proxy
+                                       |
+                                       `--> 1inch Fusion+
+````
 
-### Frontend
-- Next.js
-- TypeScript
-- React
-- Tailwind CSS
+### Analysis Flow
 
-### Authentication & Wallet
-- Privy SDK for authentication
-- Wagmi for wallet interactions
-- Web3 providers
+```text
+Natural-language request
+        |
+        v
+Token and market data
+        |
+        v
+Technical indicators
+RSI · SMA · momentum · volatility · volume
+        |
+        v
+Signal and risk assessment
+BUY · SELL · HOLD
+        |
+        v
+Explanation presented to the user
+```
 
-### AI Integration
-- ASI.One integration
-- Custom AI agent implementation
-- Natural language processing
+### Swap Flow
 
-### Cross-Chain Operations
-- 1inch Fusion+ API
-- Multi-chain support
-- Cross-chain messaging
+```text
+Select source and destination assets
+        |
+        v
+Request Fusion+ quote
+        |
+        v
+Build intent-based order
+        |
+        v
+Sign EIP-712 order
+        |
+        v
+Submit to the 1inch relayer
+        |
+        v
+Poll order status
+        |
+        v
+Reveal the matching secret when required
+        |
+        v
+Cross-chain settlement
+```
 
-## 🚀 Getting Started
+## My Contribution
 
-1. **Clone the Repository**
+I owned the third-party integration layer that connected the product experience to its external infrastructure.
+
+My work included:
+
+* Integrating the 1inch Fusion+ quote, build, signing, submission, status, and secret-reveal lifecycle
+* Building server-side proxy routes so 1inch credentials were never exposed to the browser
+* Connecting Privy authentication and embedded wallet onboarding
+* Supporting external wallets through wagmi
+* Integrating portfolio and transaction data through The Graph
+* Connecting market-data feeds used by the interface and analysis service
+* Wiring the frontend to the Python AI service
+* Normalizing external API responses and failure states for the application
+
+## Key Technical Decisions
+
+### Analysis and execution are separate
+
+The assistant produces signals, explanations, and risk assessments, but it cannot execute a transaction.
+
+A trade only proceeds after the user opens the swap interface, chooses the parameters, and signs the order. This boundary is enforced by the product flow rather than being left as a disclaimer.
+
+### Fusion+ instead of a basic swap request
+
+1inch Fusion+ uses signed, intent-based orders and resolver-driven execution. The integration supports cross-chain settlement while reducing the transaction's exposure to common forms of MEV.
+
+The resulting flow is more involved than a conventional swap API: the application must construct and sign an order, track its status, and reveal the appropriate secret during execution.
+
+### Provider credentials remain server-side
+
+Authenticated 1inch requests pass through Next.js API routes. The browser communicates only with application-controlled endpoints and never receives the provider credential.
+
+This also creates a single layer for:
+
+* Error normalization
+* Request validation
+* Provider changes
+* Rate-limit handling
+* Logging and observability
+
+### Embedded wallets reduce onboarding friction
+
+Privy allows a user to create an embedded wallet through email authentication while still supporting users who prefer MetaMask, WalletConnect, or Coinbase Wallet.
+
+This allows new users to move from login to a signed order without first installing a browser extension.
+
+## Technology Stack
+
+| Area                      | Technologies                           |
+| ------------------------- | -------------------------------------- |
+| Frontend                  | Next.js 14, React 18, TypeScript       |
+| Server state              | TanStack Query                         |
+| Authentication            | Privy                                  |
+| Wallet integration        | wagmi, viem, ethers.js                 |
+| Cross-chain execution     | 1inch Fusion+                          |
+| AI service                | Python, FastAPI                        |
+| Market analysis           | RSI, SMA, momentum, volatility, volume |
+| Portfolio data            | The Graph                              |
+| Data visualization        | Chart.js                               |
+| API protection            | Next.js API routes                     |
+| Optional deployment proxy | Cloudflare Workers                     |
+
+## Running Locally
+
+### Prerequisites
+
+* Node.js
+* npm
+* Python 3
+* A Privy application
+* A 1inch developer API key
+* Optional Graph API credentials
+
+### 1. Clone the repository
+
 ```bash
-git clone https://github.com/yourusername/neurotrade.eth.git
+git clone https://github.com/hgunduzoglu/neurotrade.eth.git
 cd neurotrade.eth
 ```
 
-2. **Install Dependencies**
+### 2. Configure the environment
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Configure the required values:
+
+```env
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+NEXT_PUBLIC_AI_API_URL=http://localhost:8000
+
+ONEINCH_API_KEY=your_1inch_api_key
+GRAPH_API_KEY=your_graph_api_key
+
+AGENT_SEED=neurotrade_ai_agent
+AGENT_PORT=8000
+LOG_LEVEL=INFO
+USE_AGENTVERSE=true
+```
+
+Do not expose `ONEINCH_API_KEY` through a `NEXT_PUBLIC_` environment variable. It is read only by the server-side proxy.
+
+### 3. Start the application
+
+The repository includes a launcher that installs the frontend and Python dependencies and starts both services:
+
+```bash
+python start_neurotrade.py
+```
+
+The services will be available at:
+
+```text
+Frontend: http://localhost:3000
+AI API:   http://localhost:8000
+```
+
+### Manual Startup
+
+Install the frontend dependencies:
+
 ```bash
 npm install
 ```
 
-3. **Configure Environment**
+Install the AI service dependencies:
+
 ```bash
-cp .env.example .env.local
-# Edit .env.local with your API keys and configuration
+python -m pip install -r neurotrade_ai_agent/requirements.txt
 ```
 
-4. **Run Development Server**
+Start the AI API:
+
+```bash
+python -m uvicorn neurotrade_ai_agent.api_bridge:app \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --reload
+```
+
+In another terminal, start the frontend:
+
 ```bash
 npm run dev
 ```
 
-5. **Access the Application**
+## Project Context
+
+* **Event:** ETHGlobal Cannes 2025
+* **Team size:** Two
+* **Result:** 1inch partner prize
+* **My role:** Third-party API and wallet integrations
+* **Status:** Hackathon prototype
+
+## Disclaimer
+
+neurotrade.eth is an experimental hackathon project. Its market signals are informational and should not be interpreted as financial advice. Do not use the prototype with funds you cannot afford to lose.
+
 ```
-Open http://localhost:3000 in your browser
-```
 
-## 🔐 Environment Variables
-
-Required environment variables:
-```
-NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
-NEXT_PUBLIC_1INCH_API_KEY=your_1inch_api_key
-NEXT_PUBLIC_ASI_API_KEY=your_asi_api_key
-```
-
-## 📚 Documentation
-
-- [Privy Documentation](https://docs.privy.io/)
-- [1inch Fusion+ API](https://docs.1inch.io/docs/fusion/introduction)
-- [ASI Documentation](https://docs.asi.one)
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Built with ❤️ by the NeuroTrade Team
